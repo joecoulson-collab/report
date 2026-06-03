@@ -1197,6 +1197,11 @@ function renderDashboard(){
     if (chart) chart.destroy();
   });
 
+  // Temporarily make ALL pages visible (but hidden from user) so Chart.js
+  // can measure real container dimensions — fixes flat charts on hidden tabs
+  const allPages = document.querySelectorAll('.page');
+  allPages.forEach(p => { p.style.display = 'block'; p.style.visibility = 'hidden'; p.style.position = 'absolute'; });
+
   const D=WEEK_DATA, WN=D.week, R=D.rolling;
 
   /* ── Header ── */
@@ -1445,6 +1450,9 @@ function renderDashboard(){
   const dpdTO=D.dpd.days.reduce((s,d)=>s+d.orders,0),dpdTE=D.dpd.days.reduce((s,d)=>s+d.errors,0);
   el('dpd-day-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody>${dpdDayRows}<tr><td>Total</td><td>${dpdTO.toLocaleString()}</td><td>${dpdTE}</td><td class="${rateClass(dpdTE/dpdTO*100)}">${(dpdTE/dpdTO*100).toFixed(2)}%</td></tr></tbody></table>`;
 
+  // Restore pages — CSS classes control visibility again
+  allPages.forEach(p => { p.style.display = ''; p.style.visibility = ''; p.style.position = ''; });
+
 } // end renderDashboard
 window.addEventListener('DOMContentLoaded', renderDashboard);
 </script>
@@ -1617,15 +1625,15 @@ function handleCSVUpload(event){
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showPage('overview',this)">Overview</div>
+  <div class="tab" onclick="showPage('overview',this)">Overview</div>
   <div class="tab" onclick="showPage('ac',this)">Abel &amp; Cole</div>
   <div class="tab" onclick="showPage('gsg',this)">GSG Global</div>
   <div class="tab" onclick="showPage('bikes',this)">FF Bikes</div>
-  <div class="tab" onclick="showPage('dpd',this)">DPD</div>
+  <div class="tab active" onclick="showPage('dpd',this)">DPD</div>
 </div>
 
 <!-- ══ OVERVIEW ══ -->
-<div class="page active" id="page-overview">
+<div class="page" id="page-overview" style="">
   <div id="overview-insight" class="insight warn">Error rate relatively stable at <strong>0.72% chargeable</strong> (-0.05pp vs last week). Tuesday was the worst day at 1.02%; Saturday the best at 0.81%. Top error type: <strong>Photo shows wrong address</strong> (33 cases). <strong>A&amp;C</strong> was the best-performing courier at 0.26%; <strong>DPD</strong> the highest at 1.38%.</div>
   <div class="kpi-row">
     <div class="kpi" id="kpi-orders"><div class="v">26,633</div><div class="l">Total Orders</div></div>
@@ -1636,7 +1644,7 @@ function handleCSVUpload(event){
     <div class="kpi bad" id="kpi-worst-day"><div class="v">Tuesday</div><div class="l">Worst Day (1.02%)</div></div>
   </div>
   <div class="row2">
-    <div class="card"><h3>Courier Error Rates — Total vs Chargeable</h3><canvas id="chart-compare" height="857" style="display: block; box-sizing: border-box; height: 428px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Courier Error Rates — Total vs Chargeable</h3><canvas id="chart-compare" height="857" width="1286" style="display: block; box-sizing: border-box; height: 428px; width: 643px;"></canvas></div>
     <div class="card"><h3>Rolling Chargeable Error Rate by Courier</h3><canvas id="chart-rolling" height="857" width="1286" style="display: block; box-sizing: border-box; height: 428px; width: 643px;"></canvas></div>
   </div>
   <div class="row2">
@@ -1708,7 +1716,7 @@ function handleCSVUpload(event){
 </div>
 
 <!-- ══ A&C ══ -->
-<div class="page" id="page-ac">
+<div class="page" id="page-ac" style="">
   <div id="ac-insight" class="insight good">Error rate relatively stable at <strong>0.26% chargeable</strong> (-0.10pp vs last week). Top error type: <strong>Photo shows wrong address</strong> (8 cases). DOT: 92.61%. Box return rate: 20.68%. 8 wrong address deliveries is a great improvement — pinpoint work by the A&amp;C team is paying off.</div>
   <div class="kpi-row" id="ac-kpis">
     <div class="kpi "><div class="v">8,428</div><div class="l">Total Orders</div></div>
@@ -1718,13 +1726,13 @@ function handleCSVUpload(event){
     <div class="kpi"><div class="v">92.61%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">20.68%</div><div class="l">Box Return Rate</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Error Rate by Depot</h3><canvas id="chart-ac-depots" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-ac-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Rate by Depot</h3><canvas id="chart-ac-depots" height="986" width="1286" style="display: block; box-sizing: border-box; height: 493px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-ac-trend" height="986" width="1286" style="display: block; box-sizing: border-box; height: 493px; width: 643px;"></canvas></div>
   </div>
   <div class="row3">
-    <div class="card"><h3>Depot Error Rate Trend (WK15–)</h3><canvas id="chart-ac-depot-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-ac-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Error Type Split</h3><canvas id="chart-ac-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Depot Error Rate Trend (WK15–)</h3><canvas id="chart-ac-depot-trend" height="602" width="821" style="display: block; box-sizing: border-box; height: 301px; width: 410px;"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-ac-error-trend" height="602" width="821" style="display: block; box-sizing: border-box; height: 301px; width: 410px;"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-ac-etypes" height="821" width="821" style="display: block; box-sizing: border-box; height: 410px; width: 410px;"></canvas></div>
   </div>
   <div class="row2">
     <div class="card scroll-wrap"><h3>Depot Breakdown</h3><div id="ac-depot-table"><table class="tbl"><thead><tr><th>Depot</th><th>Orders</th><th>Errors</th><th>Rate</th><th>DOT</th></tr></thead><tbody><tr><td>Andover</td><td>952</td><td>2</td><td class="g">0.21%</td><td>90%</td></tr><tr><td>Ashby</td><td>1,600</td><td>4</td><td class="g">0.25%</td><td>95%</td></tr><tr><td>Cambridge</td><td>1,111</td><td>5</td><td class="g">0.45%</td><td>88%</td></tr><tr><td>Doncaster</td><td>1,275</td><td>6</td><td class="g">0.47%</td><td>89.21%</td></tr><tr><td>Kent</td><td>761</td><td>8</td><td class="b">1.05%</td><td>92.67%</td></tr><tr><td>Sharpness</td><td>1,351</td><td>5</td><td class="g">0.37%</td><td>95.99%</td></tr><tr><td>Warrington</td><td>1,378</td><td>2</td><td class="g">0.15%</td><td>96.67%</td></tr><tr><td>Total</td><td>8,428</td><td>32</td><td class="g">0.38%</td><td>92.61%</td></tr></tbody></table></div></div>
@@ -1733,7 +1741,7 @@ function handleCSVUpload(event){
 </div>
 
 <!-- ══ GSG ══ -->
-<div class="page" id="page-gsg">
+<div class="page" id="page-gsg" style="">
   <div id="gsg-insight" class="insight good">Error rate relatively stable at <strong>0.51% chargeable</strong> (+0.15pp vs last week). Wednesday was the worst day at 1.13%; Friday the best at 0.25%. Top error type: <strong>Box Not on Van</strong> (12 cases). DOT: 93%. Box return rate: 26.75%. 6 of STANISLAVSTEPANENCO's errors are a loading fault from consolidated pallets — not the driver's fault.</div>
   <div class="kpi-row" id="gsg-kpis">
     <div class="kpi"><div class="v">5,909</div><div class="l">Total Orders</div></div>
@@ -1743,13 +1751,13 @@ function handleCSVUpload(event){
     <div class="kpi"><div class="v">93%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">26.75%</div><div class="l">Box Return Rate</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Driver Error Rates — This Week</h3><canvas id="chart-gsg-drivers" height="1157" style="display: block; box-sizing: border-box; height: 578px; width: 643px;" width="1286"></canvas></div>
-    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-gsg-trend" height="1157" style="display: block; box-sizing: border-box; height: 578px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Driver Error Rates — This Week</h3><canvas id="chart-gsg-drivers" height="1157" width="1286" style="display: block; box-sizing: border-box; height: 578px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-gsg-trend" height="1157" width="1286" style="display: block; box-sizing: border-box; height: 578px; width: 643px;"></canvas></div>
   </div>
   <div class="row3">
-    <div class="card"><h3>Key Driver Chargeable Rate Trend</h3><canvas id="chart-gsg-driver-trend" height="602" style="display: block; box-sizing: border-box; height: 301px; width: 410px;" width="821"></canvas></div>
-    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-gsg-error-trend" height="602" style="display: block; box-sizing: border-box; height: 301px; width: 410px;" width="821"></canvas></div>
-    <div class="card"><h3>Error Type Split</h3><canvas id="chart-gsg-etypes" height="821" style="display: block; box-sizing: border-box; height: 410px; width: 410px;" width="821"></canvas></div>
+    <div class="card"><h3>Key Driver Chargeable Rate Trend</h3><canvas id="chart-gsg-driver-trend" height="602" width="821" style="display: block; box-sizing: border-box; height: 301px; width: 410px;"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-gsg-error-trend" height="602" width="821" style="display: block; box-sizing: border-box; height: 301px; width: 410px;"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-gsg-etypes" height="821" width="821" style="display: block; box-sizing: border-box; height: 410px; width: 410px;"></canvas></div>
   </div>
   <div class="row2">
     <div class="card"><h3>Errors by Day</h3><div id="gsg-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,197</td><td>11</td><td class="w">0.92%</td></tr><tr><td>Tuesday</td><td>1,091</td><td>5</td><td class="g">0.46%</td></tr><tr><td>Wednesday</td><td>1,240</td><td>14</td><td class="b">1.13%</td></tr><tr><td>Thursday</td><td>1,186</td><td>8</td><td class="w">0.67%</td></tr><tr><td>Friday</td><td>1,195</td><td>3</td><td class="g">0.25%</td></tr><tr><td>Total</td><td>5,909</td><td>41</td><td class="w">0.69%</td></tr></tbody></table></div></div>
@@ -1758,7 +1766,7 @@ function handleCSVUpload(event){
 </div>
 
 <!-- ══ BIKES ══ -->
-<div class="page" id="page-bikes">
+<div class="page" id="page-bikes" style="">
   <div id="bikes-insight" class="insight good">Error rate relatively stable at <strong>0.35% chargeable</strong> (+0.04pp vs last week). Monday was the worst day at 0.95%; Tuesday the best at 0.18%. Top error type: <strong>Stolen</strong> (8 cases). DOT: 94%. Box return rate: 26.61%. Lydia had the highest individual error count this week.</div>
   <div class="kpi-row" id="bikes-kpis">
     <div class="kpi"><div class="v">5,095</div><div class="l">Total Orders</div></div>
@@ -1768,12 +1776,12 @@ function handleCSVUpload(event){
     <div class="kpi"><div class="v">94%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">26.61%</div><div class="l">Box Return Rate</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-bikes-days" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-bikes-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-bikes-days" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-bikes-trend" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
   </div>
   <div class="row2">
-    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-bikes-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Error Type Split</h3><canvas id="chart-bikes-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-bikes-error-trend" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-bikes-etypes" height="1286" width="1286" style="display: block; box-sizing: border-box; height: 643px; width: 643px;"></canvas></div>
   </div>
   <div class="row2">
     <div class="card"><h3>Errors by Day</h3><div id="bikes-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>840</td><td>8</td><td class="w">0.95%</td></tr><tr><td>Tuesday</td><td>1,084</td><td>2</td><td class="g">0.18%</td></tr><tr><td>Wednesday</td><td>986</td><td>8</td><td class="w">0.81%</td></tr><tr><td>Thursday</td><td>1,136</td><td>7</td><td class="w">0.62%</td></tr><tr><td>Friday</td><td>1,049</td><td>4</td><td class="g">0.38%</td></tr><tr><td>Total</td><td>5,095</td><td>29</td><td class="w">0.57%</td></tr></tbody></table></div></div>
@@ -1782,7 +1790,7 @@ function handleCSVUpload(event){
 </div>
 
 <!-- ══ DPD ══ -->
-<div class="page" id="page-dpd">
+<div class="page active" id="page-dpd" style="">
   <div id="dpd-insight" class="insight good"><strong>Improvement this week</strong> — chargeable rate down 0.15pp to 1.38%. Tuesday was the worst day at 2.33%; Saturday the best at 0.81%. Top error type: <strong>Parcel Held (DPD)</strong> (19 cases). 31 total damage-related issues ongoing — box packaging concern to monitor.</div>
   <div class="kpi-row" id="dpd-kpis">
     <div class="kpi bad"><div class="v">7,256</div><div class="l">Total Orders</div></div>
@@ -1792,12 +1800,12 @@ function handleCSVUpload(event){
     <div class="kpi bad"><div class="v">100</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi bad"><div class="v">Tuesday</div><div class="l">Worst Day (2.33%)</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-dpd-days" height="943" style="display: block; box-sizing: border-box; height: 471px; width: 643px;" width="1286"></canvas></div>
-    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-dpd-trend" height="943" style="display: block; box-sizing: border-box; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-dpd-days" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-dpd-trend" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
   </div>
   <div class="row2">
-    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-dpd-error-trend" height="943" style="display: block; box-sizing: border-box; height: 471px; width: 643px;" width="1286"></canvas></div>
-    <div class="card"><h3>Error Type Split</h3><canvas id="chart-dpd-etypes" height="1286" style="display: block; box-sizing: border-box; height: 643px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-dpd-error-trend" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-dpd-etypes" height="1286" width="1286" style="display: block; box-sizing: border-box; height: 643px; width: 643px;"></canvas></div>
   </div>
   <div class="row1">
     <div class="card"><h3>Daily Breakdown</h3><div id="dpd-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,591</td><td>19</td><td class="b">1.19%</td></tr><tr><td>Tuesday</td><td>1,545</td><td>36</td><td class="b">2.33%</td></tr><tr><td>Wednesday</td><td>967</td><td>19</td><td class="b">1.96%</td></tr><tr><td>Thursday</td><td>965</td><td>13</td><td class="b">1.35%</td></tr><tr><td>Friday</td><td>1,347</td><td>21</td><td class="b">1.56%</td></tr><tr><td>Saturday</td><td>491</td><td>4</td><td class="w">0.81%</td></tr><tr><td>Sunday</td><td>350</td><td>3</td><td class="w">0.86%</td></tr><tr><td>Total</td><td>7,256</td><td>115</td><td class="b">1.58%</td></tr></tbody></table></div></div>
