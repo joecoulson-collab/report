@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freddie's Flowers — Logistics KPI Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<style>
+  :root {
+    --green-dark:#2d4a2d; --green-mid:#4a7c4a; --green-light:#8fb88f;
+    --cream:#f5f0e8; --amber:#d4a017; --amber-light:#f0c040;
+    --red:#c0392b; --white:#ffffff;
+    --text-dark:#1a1a1a; --text-mid:#444; --text-light:#777;
+    --good:#2d7a2d; --warn:#d4a017; --bad:#c0392b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cream);color:var(--text-dark);font-size:14px;line-height:1.5;}
+  .header{background:var(--green-dark);color:white;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid var(--amber);}
+  .header-left h1{font-size:20px;font-weight:700;}
+  .header-left p{font-size:12px;opacity:.7;margin-top:2px;}
+  .header-right{display:flex;gap:24px;}
+  .hkpi .val{font-size:28px;font-weight:800;color:var(--amber-light);text-align:right;}
+  .hkpi .lbl{font-size:10px;opacity:.65;text-transform:uppercase;letter-spacing:.5px;text-align:right;}
+  .tabs{background:var(--green-dark);display:flex;gap:2px;padding:0 32px;border-bottom:3px solid var(--green-mid);}
+  .tab{padding:10px 18px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);border-bottom:3px solid transparent;margin-bottom:-3px;transition:.15s;user-select:none;}
+  .tab:hover{color:rgba(255,255,255,.85);}
+  .tab.active{color:white;border-bottom-color:var(--amber);}
+  .page{display:none;padding:24px 32px;}
+  .page.active{display:block;}
+  .insight{border-radius:8px;padding:13px 16px;margin-bottom:20px;font-size:13px;line-height:1.65;}
+  .insight.good{background:#eef6ee;border-left:4px solid var(--green-mid);color:#2a4a2a;}
+  .insight.warn{background:#fdf8ec;border-left:4px solid var(--amber);color:#5a4000;}
+  .insight.bad{background:#fdf0ee;border-left:4px solid var(--red);color:#5a1000;}
+  .insight strong{font-weight:700;}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;}
+  .kpi{background:white;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--green-mid);}
+  .kpi.warn{border-left-color:var(--amber);}
+  .kpi.bad{border-left-color:var(--red);}
+  .kpi .v{font-size:26px;font-weight:800;color:var(--green-dark);line-height:1;}
+  .kpi.warn .v{color:var(--amber);}
+  .kpi.bad .v{color:var(--red);}
+  .kpi .delta{font-size:11px;margin-top:2px;font-weight:600;}
+  .kpi .delta.up{color:var(--bad);}
+  .kpi .delta.down{color:var(--good);}
+  .kpi .delta.flat{color:var(--text-light);}
+  .kpi .l{font-size:11px;color:var(--text-light);margin-top:3px;text-transform:uppercase;letter-spacing:.3px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+  .row21{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:20px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:20px;}
+  .row1{margin-bottom:20px;}
+  .card{background:white;border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+  .card h3{font-size:11px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;border-bottom:1px solid #eee;padding-bottom:8px;}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .tbl th{background:var(--green-dark);color:white;padding:7px 9px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;}
+  .tbl th:last-child,.tbl td:last-child{text-align:right;}
+  .tbl td{padding:6px 9px;border-bottom:1px solid #f2f2f2;}
+  .tbl tr:last-child td{border-bottom:none;font-weight:700;background:#fafafa;}
+  .tbl tr:nth-child(even) td{background:#fafafa;}
+  .g{color:var(--good);font-weight:600;}
+  .w{color:var(--warn);font-weight:600;}
+  .b{color:var(--bad);font-weight:600;}
+  .bar-r{margin-bottom:9px;}
+  .bar-r .bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px;}
+  .bar-r .bt{background:#eee;border-radius:99px;height:9px;}
+  .bar-r .bf{height:9px;border-radius:99px;}
+  /* ── Heatmap ── */
+  .heatmap-wrap{overflow-x:auto;}
+  .heatmap{border-collapse:collapse;font-size:12px;width:100%;}
+  .heatmap th{background:var(--green-dark);color:white;padding:8px 14px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.3px;}
+  .heatmap th.day-th{text-align:left;min-width:90px;}
+  .heatmap td{padding:10px 14px;text-align:center;font-weight:700;font-size:12px;border:2px solid var(--cream);}
+  .heatmap td.day-lbl{text-align:left;background:#f8f8f8;font-weight:600;color:var(--text-mid);}
+  .heatmap td.na{background:#f5f5f5;color:#ccc;font-weight:400;}
+  /* ── Upload bar ── */
+  .upload-bar{background:#1e3a1e;padding:9px 32px;display:flex;align-items:center;gap:14px;font-size:13px;color:rgba(255,255,255,0.75);border-bottom:1px solid rgba(255,255,255,0.08);}
+  .upload-bar label{display:inline-flex;align-items:center;gap:7px;background:var(--amber);color:#1a1000;font-weight:700;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:background .15s;letter-spacing:.2px;}
+  .upload-bar label:hover{background:var(--amber-light);}
+  .upload-bar input[type=file]{display:none;}
+  #upload-status{font-size:12px;padding:4px 10px;border-radius:5px;font-weight:600;}
+  #upload-status.ok{background:#1e4a1e;color:#7fcc7f;}
+  #upload-status.err{background:#4a1a1a;color:#ff9090;}
+  #upload-status.idle{color:rgba(255,255,255,0.4);}
+  .export-btn{display:inline-flex;align-items:center;gap:7px;background:var(--green-mid);color:white;font-weight:700;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;border:none;transition:background .15s;letter-spacing:.2px;}
+  .export-btn:hover{background:#3a6a3a;}
+  .section-label{font-size:11px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--green-light);}
+  @media(max-width:768px){.row2,.row21,.row3{grid-template-columns:1fr;}.header{flex-direction:column;gap:12px;}.header-right{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+
+<script>
+/* =========================================================
+   ★  WEEKLY DATA — UPDATE THIS BLOCK EACH WEEK  ★
+   =========================================================
+   Or use the CSV upload button — much easier!
+   ========================================================= */
+/* DATA_START */
+const WEEK_DATA = {
+  "week": 21,
+  "targets": {
+    "ac": 0.3,
+    "bikes": 0.3,
+    "gsg": 0.4,
+    "dpd": 1.2
+  },
+  "rolling": {
+    "weeks": [
+      "WK14",
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "acCharge": [
+      null,
+      0.28,
+      0.3,
+      0.36,
+      0.64,
+      0.19,
+      0.36,
+      0.26
+    ],
+    "acTotal": [
+      null,
+      0.44,
+      0.43,
+      0.56,
+      0.72,
+      0.36,
+      0.64,
+      0.38
+    ],
+    "bikesCharge": [
+      0.42,
+      0.52,
+      0.21,
+      0.3,
+      0.29,
+      0.25,
+      0.31,
+      0.35
+    ],
+    "bikesTotal": [
+      0.59,
+      0.79,
+      0.38,
+      0.51,
+      0.51,
+      0.37,
+      0.54,
+      0.57
+    ],
+    "gsgCharge": [
+      0.27,
+      0.37,
+      0.26,
+      0.38,
+      0.19,
+      0.31,
+      0.36,
+      0.51
+    ],
+    "gsgTotal": [
+      0.43,
+      0.49,
+      0.43,
+      0.5,
+      0.35,
+      0.51,
+      0.51,
+      0.69
+    ],
+    "dpdCharge": [
+      1.86,
+      1.19,
+      1.52,
+      1.24,
+      1.96,
+      1.32,
+      1.53,
+      1.38
+    ],
+    "dpdTotal": [
+      2.24,
+      1.41,
+      1.85,
+      1.54,
+      2.15,
+      1.49,
+      1.7,
+      1.57
+    ],
+    "allCharge": [
+      null,
+      0.61,
+      0.64,
+      0.63,
+      0.92,
+      0.67,
+      0.77,
+      0.72
+    ],
+    "allTotal": [
+      null,
+      0.87,
+      0.83,
+      0.83,
+      1.1,
+      0.83,
+      0.97,
+      0.9
+    ]
+  },
+  "rollingDot": {
+    "weeks": [
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "ac": [
+      91,
+      92.5,
+      90,
+      93,
+      91.5,
+      92,
+      92.61
+    ],
+    "bikes": [
+      93,
+      94,
+      92,
+      95,
+      93,
+      94,
+      94
+    ],
+    "gsg": [
+      92,
+      93,
+      91,
+      94,
+      92,
+      93,
+      93
+    ]
+  },
+  "rollingBox": {
+    "weeks": [
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "ac": [
+      21,
+      22,
+      20,
+      23,
+      19,
+      21,
+      20.68
+    ],
+    "bikes": [
+      25,
+      26,
+      24,
+      27,
+      25,
+      26,
+      26.61
+    ],
+    "gsg": [
+      26,
+      27,
+      25,
+      28,
+      26,
+      27,
+      26.75
+    ]
+  },
+  "errorTrends": {
+    "weeks": [
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "ac": [
+      {
+        "label": "Photo shows wrong address",
+        "data": [
+          6,
+          7,
+          9,
+          6,
+          5,
+          8,
+          8
+        ]
+      },
+      {
+        "label": "Stolen",
+        "data": [
+          3,
+          4,
+          5,
+          3,
+          6,
+          4,
+          5
+        ]
+      },
+      {
+        "label": "Box Not on Van",
+        "data": [
+          4,
+          3,
+          2,
+          3,
+          1,
+          2,
+          2
+        ]
+      }
+    ],
+    "gsg": [
+      {
+        "label": "Box Not on Van",
+        "data": [
+          9,
+          10,
+          8,
+          11,
+          7,
+          8,
+          12
+        ]
+      },
+      {
+        "label": "Photo shows wrong address",
+        "data": [
+          5,
+          6,
+          8,
+          7,
+          5,
+          7,
+          8
+        ]
+      },
+      {
+        "label": "Can't Get Access",
+        "data": [
+          5,
+          6,
+          7,
+          8,
+          6,
+          7,
+          7
+        ]
+      }
+    ],
+    "bikes": [
+      {
+        "label": "Stolen",
+        "data": [
+          6,
+          7,
+          8,
+          7,
+          9,
+          6,
+          8
+        ]
+      },
+      {
+        "label": "Photo shows wrong address",
+        "data": [
+          4,
+          5,
+          7,
+          6,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "label": "Box Not on Van",
+        "data": [
+          4,
+          5,
+          4,
+          5,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    "dpd": [
+      {
+        "label": "Parcel Held (DPD)",
+        "data": [
+          18,
+          20,
+          19,
+          22,
+          17,
+          20,
+          19
+        ]
+      },
+      {
+        "label": "Box Damaged",
+        "data": [
+          14,
+          17,
+          18,
+          20,
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "label": "Out of Time",
+        "data": [
+          11,
+          13,
+          14,
+          16,
+          13,
+          14,
+          14
+        ]
+      }
+    ]
+  },
+  "depotTrends": {
+    "weeks": [
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "depots": [
+      {
+        "name": "Andover",
+        "data": [
+          0.3,
+          0.25,
+          0.2,
+          0.35,
+          0.15,
+          0.25,
+          0.21
+        ]
+      },
+      {
+        "name": "Ashby",
+        "data": [
+          0.35,
+          0.28,
+          0.3,
+          0.4,
+          0.2,
+          0.28,
+          0.25
+        ]
+      },
+      {
+        "name": "Cambridge",
+        "data": [
+          0.5,
+          0.45,
+          0.48,
+          0.6,
+          0.35,
+          0.42,
+          0.45
+        ]
+      },
+      {
+        "name": "Doncaster",
+        "data": [
+          0.45,
+          0.48,
+          0.5,
+          0.55,
+          0.38,
+          0.44,
+          0.47
+        ]
+      },
+      {
+        "name": "Kent",
+        "data": [
+          0.85,
+          0.9,
+          0.95,
+          1.2,
+          0.75,
+          0.95,
+          1.05
+        ]
+      },
+      {
+        "name": "Sharpness",
+        "data": [
+          0.35,
+          0.4,
+          0.38,
+          0.5,
+          0.3,
+          0.35,
+          0.37
+        ]
+      },
+      {
+        "name": "Warrington",
+        "data": [
+          0.2,
+          0.18,
+          0.22,
+          0.25,
+          0.15,
+          0.18,
+          0.15
+        ]
+      }
+    ]
+  },
+  "driverTrends": {
+    "weeks": [
+      "WK15",
+      "WK16",
+      "WK17",
+      "WK18",
+      "WK19",
+      "WK20",
+      "WK21"
+    ],
+    "drivers": [
+      {
+        "name": "STANISLAVSTEPANENCO",
+        "data": [
+          1.2,
+          1.5,
+          1.3,
+          1.8,
+          1.4,
+          1.6,
+          1.67
+        ]
+      },
+      {
+        "name": "Cosmin Colesnc",
+        "data": [
+          0.8,
+          1,
+          1.2,
+          1.5,
+          0.9,
+          1.1,
+          1.5
+        ]
+      },
+      {
+        "name": "Shazad Global",
+        "data": [
+          0.25,
+          0.3,
+          0.4,
+          0.5,
+          0.35,
+          0.4,
+          0.37
+        ]
+      }
+    ]
+  },
+  "all": {
+    "totalOrders": 26633,
+    "chargeableErrors": 191,
+    "nonChargeableErrors": 49,
+    "deliveredErrors": 81,
+    "notDeliveredErrors": 159,
+    "prevWeekChargeable": 0.77,
+    "days": [
+      {
+        "name": "Monday",
+        "orders": 5361,
+        "errors": 47
+      },
+      {
+        "name": "Tuesday",
+        "orders": 5306,
+        "errors": 54
+      },
+      {
+        "name": "Wednesday",
+        "orders": 5066,
+        "errors": 46
+      },
+      {
+        "name": "Thursday",
+        "orders": 4918,
+        "errors": 42
+      },
+      {
+        "name": "Friday",
+        "orders": 5141,
+        "errors": 45
+      },
+      {
+        "name": "Saturday",
+        "orders": 491,
+        "errors": 4
+      },
+      {
+        "name": "Sunday",
+        "orders": 350,
+        "errors": 3
+      }
+    ],
+    "errorTypes": [
+      {
+        "label": "Photo shows wrong address",
+        "count": 33
+      },
+      {
+        "label": "Stolen",
+        "count": 22
+      },
+      {
+        "label": "Box Not on Van",
+        "count": 21
+      },
+      {
+        "label": "Box Damaged",
+        "count": 20
+      },
+      {
+        "label": "Parcel Held (DPD)",
+        "count": 19
+      },
+      {
+        "label": "Other",
+        "count": 125
+      }
+    ]
+  },
+  "ac": {
+    "totalOrders": 8428,
+    "chargeableErrors": 22,
+    "nonChargeableErrors": 10,
+    "prevWeekChargeable": 0.36,
+    "dot": 92.61,
+    "boxReturnRate": 20.68,
+    "depots": [
+      {
+        "name": "Andover",
+        "orders": 952,
+        "errors": 2,
+        "dot": 90
+      },
+      {
+        "name": "Ashby",
+        "orders": 1600,
+        "errors": 4,
+        "dot": 95
+      },
+      {
+        "name": "Cambridge",
+        "orders": 1111,
+        "errors": 5,
+        "dot": 88
+      },
+      {
+        "name": "Doncaster",
+        "orders": 1275,
+        "errors": 6,
+        "dot": 89.21
+      },
+      {
+        "name": "Kent",
+        "orders": 761,
+        "errors": 8,
+        "dot": 92.67
+      },
+      {
+        "name": "Sharpness",
+        "orders": 1351,
+        "errors": 5,
+        "dot": 95.99
+      },
+      {
+        "name": "Warrington",
+        "orders": 1378,
+        "errors": 2,
+        "dot": 96.67
+      }
+    ],
+    "errorTypes": [
+      {
+        "label": "Photo shows wrong address",
+        "count": 8
+      },
+      {
+        "label": "Stolen",
+        "count": 5
+      },
+      {
+        "label": "Received wrong box",
+        "count": 5
+      },
+      {
+        "label": "Box Damaged",
+        "count": 2
+      },
+      {
+        "label": "Box Not on Van",
+        "count": 2
+      },
+      {
+        "label": "Other",
+        "count": 10
+      }
+    ],
+    "boxReturns": [
+      {
+        "day": "Monday",
+        "delivered": 1552,
+        "returned": 345
+      },
+      {
+        "day": "Tuesday",
+        "delivered": 1743,
+        "returned": 311
+      },
+      {
+        "day": "Wednesday",
+        "delivered": 1863,
+        "returned": 406
+      },
+      {
+        "day": "Thursday",
+        "delivered": 1698,
+        "returned": 307
+      },
+      {
+        "day": "Friday",
+        "delivered": 1572,
+        "returned": 374
+      }
+    ],
+    "notes": "8 wrong address deliveries is a great improvement — pinpoint work by the A&C team is paying off."
+  },
+  "gsg": {
+    "totalOrders": 5909,
+    "chargeableErrors": 30,
+    "nonChargeableErrors": 11,
+    "prevWeekChargeable": 0.36,
+    "dot": 93,
+    "boxReturnRate": 26.75,
+    "days": [
+      {
+        "name": "Monday",
+        "orders": 1197,
+        "errors": 11
+      },
+      {
+        "name": "Tuesday",
+        "orders": 1091,
+        "errors": 5
+      },
+      {
+        "name": "Wednesday",
+        "orders": 1240,
+        "errors": 14
+      },
+      {
+        "name": "Thursday",
+        "orders": 1186,
+        "errors": 8
+      },
+      {
+        "name": "Friday",
+        "orders": 1195,
+        "errors": 3
+      }
+    ],
+    "errorTypes": [
+      {
+        "label": "Box Not on Van",
+        "count": 12
+      },
+      {
+        "label": "Photo shows wrong address",
+        "count": 8
+      },
+      {
+        "label": "Can't Get Access",
+        "count": 7
+      },
+      {
+        "label": "Delivery instructions not followed",
+        "count": 4
+      },
+      {
+        "label": "Stolen",
+        "count": 3
+      },
+      {
+        "label": "Other",
+        "count": 7
+      }
+    ],
+    "drivers": [
+      {
+        "name": "STANISLAVSTEPANENCO",
+        "chargeable": 9,
+        "deliveries": 556
+      },
+      {
+        "name": "Cosmin Colesnc",
+        "chargeable": 6,
+        "deliveries": 399
+      },
+      {
+        "name": "Shazad Global",
+        "chargeable": 2,
+        "deliveries": 517
+      },
+      {
+        "name": "Barbara",
+        "chargeable": 1,
+        "deliveries": 483
+      },
+      {
+        "name": "Katarzyna Bakaj",
+        "chargeable": 1,
+        "deliveries": 422
+      },
+      {
+        "name": "SANJAYGSG",
+        "chargeable": 1,
+        "deliveries": 540
+      },
+      {
+        "name": "DannyGSG",
+        "chargeable": 1,
+        "deliveries": 508
+      },
+      {
+        "name": "Daniel Mlot",
+        "chargeable": 0,
+        "deliveries": 501
+      },
+      {
+        "name": "IONUTHARRY",
+        "chargeable": 0,
+        "deliveries": 75
+      },
+      {
+        "name": "James Lynch",
+        "chargeable": 0,
+        "deliveries": 460
+      },
+      {
+        "name": "Julie Rand",
+        "chargeable": 0,
+        "deliveries": 461
+      },
+      {
+        "name": "Ken Ogiste",
+        "chargeable": 0,
+        "deliveries": 590
+      },
+      {
+        "name": "LesleyGSG",
+        "chargeable": 0,
+        "deliveries": 229
+      }
+    ],
+    "boxReturns": [
+      {
+        "day": "Monday",
+        "delivered": 1126,
+        "returned": 419
+      },
+      {
+        "day": "Tuesday",
+        "delivered": 1129,
+        "returned": 420
+      },
+      {
+        "day": "Wednesday",
+        "delivered": 1186,
+        "returned": 326
+      },
+      {
+        "day": "Thursday",
+        "delivered": 1255,
+        "returned": 409
+      },
+      {
+        "day": "Friday",
+        "delivered": 1188,
+        "returned": 0
+      }
+    ],
+    "notes": "6 of STANISLAVSTEPANENCO's errors are a loading fault from consolidated pallets — not the driver's fault."
+  },
+  "bikes": {
+    "totalOrders": 5095,
+    "chargeableErrors": 18,
+    "nonChargeableErrors": 11,
+    "prevWeekChargeable": 0.31,
+    "dot": 94,
+    "boxReturnRate": 26.61,
+    "days": [
+      {
+        "name": "Monday",
+        "orders": 840,
+        "errors": 8
+      },
+      {
+        "name": "Tuesday",
+        "orders": 1084,
+        "errors": 2
+      },
+      {
+        "name": "Wednesday",
+        "orders": 986,
+        "errors": 8
+      },
+      {
+        "name": "Thursday",
+        "orders": 1136,
+        "errors": 7
+      },
+      {
+        "name": "Friday",
+        "orders": 1049,
+        "errors": 4
+      }
+    ],
+    "errorTypes": [
+      {
+        "label": "Stolen",
+        "count": 8
+      },
+      {
+        "label": "Photo shows wrong address",
+        "count": 7
+      },
+      {
+        "label": "Box Not on Van",
+        "count": 6
+      },
+      {
+        "label": "Box left in wrong place",
+        "count": 3
+      },
+      {
+        "label": "Can't Get Access",
+        "count": 3
+      },
+      {
+        "label": "Other",
+        "count": 2
+      }
+    ],
+    "boxReturns": [
+      {
+        "day": "Monday",
+        "delivered": 840,
+        "returned": 0
+      },
+      {
+        "day": "Tuesday",
+        "delivered": 1084,
+        "returned": 704
+      },
+      {
+        "day": "Wednesday",
+        "delivered": 986,
+        "returned": 0
+      },
+      {
+        "day": "Thursday",
+        "delivered": 1136,
+        "returned": 652
+      },
+      {
+        "day": "Friday",
+        "delivered": 1049,
+        "returned": 0
+      }
+    ],
+    "notes": "Lydia had the highest individual error count this week."
+  },
+  "dpd": {
+    "totalOrders": 7256,
+    "chargeableErrors": 100,
+    "nonChargeableErrors": 14,
+    "prevWeekChargeable": 1.53,
+    "dot": null,
+    "boxReturnRate": null,
+    "days": [
+      {
+        "name": "Monday",
+        "orders": 1591,
+        "errors": 19
+      },
+      {
+        "name": "Tuesday",
+        "orders": 1545,
+        "errors": 36
+      },
+      {
+        "name": "Wednesday",
+        "orders": 967,
+        "errors": 19
+      },
+      {
+        "name": "Thursday",
+        "orders": 965,
+        "errors": 13
+      },
+      {
+        "name": "Friday",
+        "orders": 1347,
+        "errors": 21
+      },
+      {
+        "name": "Saturday",
+        "orders": 491,
+        "errors": 4
+      },
+      {
+        "name": "Sunday",
+        "orders": 350,
+        "errors": 3
+      }
+    ],
+    "errorTypes": [
+      {
+        "label": "Parcel Held (DPD)",
+        "count": 19
+      },
+      {
+        "label": "Box Damaged",
+        "count": 18
+      },
+      {
+        "label": "Out of Time",
+        "count": 14
+      },
+      {
+        "label": "Box Damaged in Transit",
+        "count": 13
+      },
+      {
+        "label": "Photo shows wrong address",
+        "count": 11
+      },
+      {
+        "label": "Other",
+        "count": 39
+      }
+    ],
+    "notes": "31 total damage-related issues ongoing — box packaging concern to monitor."
+  }
+};
+/* DATA_END */
+
+/* ── Helpers ── */
+const pct=(n,d,dp=2)=>d?(n/d*100).toFixed(dp)+'%':'—';
+const rateColor=v=>v<=0.5?'#2d7a2d':v<=1.0?'#d4a017':'#c0392b';
+const rateClass=v=>v<=0.5?'g':v<=1.0?'w':'b';
+const heatColor=v=>{
+  if(v===null||v===undefined)return'#f0f0f0';
+  if(v===0)return'#f0f8f0';
+  if(v<=0.3)return'#c8e6c9';
+  if(v<=0.5)return'#a5d6a7';
+  if(v<=0.75)return'#fff9c4';
+  if(v<=1.0)return'#ffe082';
+  if(v<=1.5)return'#ffab91';
+  if(v<=2.0)return'#ef9a9a';
+  return'#e57373';
+};
+const heatText=v=>{if(v===null||v===undefined)return'—';return v.toFixed(2)+'%';};
+const C={ac:'#b5982a',bikes:'#4a7c4a',gsg:'#5b8fb9',dpd:'#c0392b',total:'#333',charge:'#4a7c4a'};
+const TREND_COLORS=['#c0392b','#2980b9','#27ae60','#8e44ad','#e67e22','#16a085'];
+const DONUT_COLORS=['#c0392b','#e67e22','#f1c40f','#27ae60','#2980b9','#8e44ad','#16a085','#d35400','#7f8c8d','#bdc3c7'];
+const dftOpt=extra=>({responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:11}}},...(extra||{})}});
+
+function el(id){return document.getElementById(id);}
+function showPage(name,tabEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el('page-'+name).classList.add('active');
+  tabEl.classList.add('active');
+}
+
+/* ── Auto-summary ── */
+function buildSummary(key){
+  const d=key==='all'?WEEK_DATA.all:WEEK_DATA[key];
+  const charged=d.chargeableErrors,nonCharged=d.nonChargeableErrors;
+  const totalErrors=charged+nonCharged;
+  const chargeRate=charged/d.totalOrders*100;
+  const wow=chargeRate-d.prevWeekChargeable;
+  let tone='good',opener='';
+  if(wow<=-0.1){opener=`<strong>Improvement this week</strong> — chargeable rate down ${Math.abs(wow).toFixed(2)}pp to ${chargeRate.toFixed(2)}%.`;}
+  else if(wow>=0.15){tone=chargeRate>1?'bad':'warn';opener=`<strong>Error rate increased</strong> by ${wow.toFixed(2)}pp to ${chargeRate.toFixed(2)}% chargeable.`;}
+  else{tone=chargeRate>1?'bad':chargeRate>0.6?'warn':'good';opener=`Error rate relatively stable at <strong>${chargeRate.toFixed(2)}% chargeable</strong> (${wow>=0?'+':''}${wow.toFixed(2)}pp vs last week).`;}
+  const days=d.days||[];
+  let dayLines='';
+  if(days.length){
+    const wr=days.map(dd=>({...dd,rate:dd.errors/dd.orders*100}));
+    const worst=wr.reduce((a,b)=>a.rate>b.rate?a:b);
+    const best=wr.reduce((a,b)=>a.rate<b.rate?a:b);
+    dayLines=` ${worst.name} was the worst day at ${worst.rate.toFixed(2)}%; ${best.name} the best at ${best.rate.toFixed(2)}%.`;
+  }
+  const et=d.errorTypes||[];
+  let errorLine='';
+  if(et.length){const no=et.filter(e=>e.label!=='Other');if(no.length){const top=no.reduce((a,b)=>a.count>b.count?a:b);errorLine=` Top error type: <strong>${top.label}</strong> (${top.count} cases).`;}}
+  let dotLine='';
+  if(d.dot)dotLine=` DOT: ${d.dot}%.`;
+  if(d.boxReturnRate)dotLine+=` Box return rate: ${d.boxReturnRate}%.`;
+  return{tone,text:opener+dayLines+errorLine+dotLine+(d.notes?` ${d.notes}`:'')};
+}
+function buildOverviewSummary(){
+  const s=buildSummary('all');
+  const cs=[{name:'A&C',rate:WEEK_DATA.ac.chargeableErrors/WEEK_DATA.ac.totalOrders*100},{name:'Bikes',rate:WEEK_DATA.bikes.chargeableErrors/WEEK_DATA.bikes.totalOrders*100},{name:'GSG',rate:WEEK_DATA.gsg.chargeableErrors/WEEK_DATA.gsg.totalOrders*100},{name:'DPD',rate:WEEK_DATA.dpd.chargeableErrors/WEEK_DATA.dpd.totalOrders*100}];
+  const best=cs.reduce((a,b)=>a.rate<b.rate?a:b);
+  const worst=cs.reduce((a,b)=>a.rate>b.rate?a:b);
+  s.text+=` <strong>${best.name}</strong> was the best-performing courier at ${best.rate.toFixed(2)}%; <strong>${worst.name}</strong> the highest at ${worst.rate.toFixed(2)}%.`;
+  return s;
+}
+
+/* ── Target line dataset helper ── */
+function targetDS(weeks, target, label){
+  return{label:`Target (${target}%)`,data:weeks.map(()=>target),borderColor:'#e74c3c',borderWidth:1.5,pointRadius:0,borderDash:[6,3],fill:false,spanGaps:true,tension:0};
+}
+
+/* ── Error type trend chart helper ── */
+function errorTrendChart(canvasId, trends, weeks){
+  if(!el(canvasId))return;
+  new Chart(el(canvasId),{
+    type:'line',
+    data:{
+      labels:weeks,
+      datasets:trends.map((t,i)=>({label:t.label,data:t.data,borderColor:TREND_COLORS[i%TREND_COLORS.length],pointRadius:4,tension:.3,fill:false,spanGaps:true,borderWidth:2}))
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:11}}}}}
+  });
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────────────────── */
+function renderDashboard(){
+  Object.values(Chart.instances||{}).forEach(c=>{try{c.destroy();}catch(e){}});
+
+  const D=WEEK_DATA, WN=D.week, R=D.rolling;
+
+  /* ── Header ── */
+  el('hdr-week').textContent=`Week ${WN}`;
+  el('hdr-orders').textContent=D.all.totalOrders.toLocaleString();
+  const allCharge=(D.all.chargeableErrors/D.all.totalOrders*100).toFixed(2);
+  const allTotal=((D.all.chargeableErrors+D.all.nonChargeableErrors)/D.all.totalOrders*100).toFixed(2);
+  el('hdr-charge').textContent=allCharge+'%';
+  el('hdr-total').textContent=allTotal+'%';
+
+  /* ── KPIs ── */
+  const totalErrors=D.all.chargeableErrors+D.all.nonChargeableErrors;
+  const chargeRate=D.all.chargeableErrors/D.all.totalOrders*100;
+  function kpiDelta(wow){
+    if(Math.abs(wow)<0.05)return`<span class="delta flat">≈ flat vs last week</span>`;
+    return wow<0?`<span class="delta down">▼ ${Math.abs(wow).toFixed(2)}pp vs WK${WN-1}</span>`:`<span class="delta up">▲ ${wow.toFixed(2)}pp vs WK${WN-1}</span>`;
+  }
+  el('kpi-orders').innerHTML=`<div class="v">${D.all.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div>`;
+  el('kpi-total-err').innerHTML=`<div class="v">${totalErrors}</div><div class="l">Total Errors</div>`;
+  el('kpi-charge').innerHTML=`<div class="v">${allCharge}%</div>${kpiDelta(chargeRate-D.all.prevWeekChargeable)}<div class="l">Chargeable Rate</div>`;
+  el('kpi-notdel').innerHTML=`<div class="v">${D.all.notDeliveredErrors}</div><div class="l">Not Delivered</div>`;
+  el('kpi-delivered').innerHTML=`<div class="v">${D.all.deliveredErrors}</div><div class="l">Delivered Errors</div>`;
+  const worstDay=[...D.all.days].sort((a,b)=>(b.errors/b.orders)-(a.errors/a.orders))[0];
+  el('kpi-worst-day').innerHTML=`<div class="v">${worstDay.name}</div><div class="l">Worst Day (${(worstDay.errors/worstDay.orders*100).toFixed(2)}%)</div>`;
+
+  /* ── Overview insight ── */
+  const ovs=buildOverviewSummary();
+  el('overview-insight').className=`insight ${ovs.tone}`;
+  el('overview-insight').innerHTML=ovs.text;
+
+  /* ── Courier comparison ── */
+  new Chart(el('chart-compare'),{type:'bar',data:{labels:['A&C','Bikes','GSG','DPD','All'],datasets:[
+    {label:'Total %',data:[(D.ac.chargeableErrors+D.ac.nonChargeableErrors)/D.ac.totalOrders*100,(D.bikes.chargeableErrors+D.bikes.nonChargeableErrors)/D.bikes.totalOrders*100,(D.gsg.chargeableErrors+D.gsg.nonChargeableErrors)/D.gsg.totalOrders*100,(D.dpd.chargeableErrors+D.dpd.nonChargeableErrors)/D.dpd.totalOrders*100,(D.all.chargeableErrors+D.all.nonChargeableErrors)/D.all.totalOrders*100].map(v=>+v.toFixed(2)),backgroundColor:['#d4c07a','#8aba8a','#9bbdd4','#e07070','#aaa']},
+    {label:'Chargeable %',data:[D.ac.chargeableErrors/D.ac.totalOrders*100,D.bikes.chargeableErrors/D.bikes.totalOrders*100,D.gsg.chargeableErrors/D.gsg.totalOrders*100,D.dpd.chargeableErrors/D.dpd.totalOrders*100,D.all.chargeableErrors/D.all.totalOrders*100].map(v=>+v.toFixed(2)),backgroundColor:['#b5982a','#4a7c4a','#3a6f9a','#c0392b','#666']},
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  /* ── Rolling trend ── */
+  new Chart(el('chart-rolling'),{type:'line',data:{labels:R.weeks,datasets:[
+    {label:'A&C (Charge)',data:R.acCharge,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,borderWidth:2,spanGaps:true},
+    {label:'Bikes (Charge)',data:R.bikesCharge,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,borderWidth:2,spanGaps:true},
+    {label:'GSG (Charge)',data:R.gsgCharge,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,borderWidth:2,spanGaps:true},
+    {label:'DPD (Charge)',data:R.dpdCharge,borderColor:C.dpd,pointRadius:4,tension:.3,fill:false,borderWidth:2.5,spanGaps:true},
+    {label:'All Charge',data:R.allCharge,borderColor:C.total,pointRadius:4,tension:.3,fill:false,borderWidth:2,borderDash:[4,3],spanGaps:true},
+    {label:'All Total',data:R.allTotal,borderColor:'#888',pointRadius:3,tension:.3,fill:false,borderWidth:1.5,borderDash:[2,2],spanGaps:true},
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  /* ── DOT rolling chart ── */
+  const RD=D.rollingDot;
+  new Chart(el('chart-dot-rolling'),{type:'line',data:{labels:RD.weeks,datasets:[
+    {label:'A&C',data:RD.ac,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'FF Bikes',data:RD.bikes,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'GSG',data:RD.gsg,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'Target (95%)',data:RD.weeks.map(()=>95),borderColor:'#e74c3c',pointRadius:0,borderDash:[6,3],fill:false,borderWidth:1.5},
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}},min:85,max:100}})});
+
+  /* ── Box return rolling chart ── */
+  const RB=D.rollingBox;
+  new Chart(el('chart-box-rolling'),{type:'line',data:{labels:RB.weeks,datasets:[
+    {label:'A&C',data:RB.ac,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'FF Bikes',data:RB.bikes,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'GSG',data:RB.gsg,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  /* ── Day breakdown ── */
+  const dayLabels=D.all.days.map(d=>d.name.slice(0,3));
+  const dayRates=D.all.days.map(d=>+(d.errors/d.orders*100).toFixed(2));
+  new Chart(el('chart-days'),{type:'bar',data:{labels:dayLabels,datasets:[
+    {label:'Orders',data:D.all.days.map(d=>d.orders),backgroundColor:'#dde8dd',yAxisID:'y1'},
+    {label:'Error Rate %',data:dayRates,type:'line',yAxisID:'y2',pointRadius:5,borderColor:'#555',backgroundColor:dayRates.map(rateColor),borderWidth:1.5,tension:.2}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{grid:{display:false}},y1:{type:'linear',position:'left',grid:{color:'#f0f0f0'},ticks:{font:{size:11}}},y2:{type:'linear',position:'right',grid:{display:false},ticks:{callback:v=>v+'%',font:{size:11}},min:0,max:Math.max(...dayRates)*1.5}}}});
+
+  /* ── Error types donut ── */
+  new Chart(el('chart-etypes'),{type:'doughnut',data:{labels:D.all.errorTypes.map(e=>e.label),datasets:[{data:D.all.errorTypes.map(e=>e.count),backgroundColor:D.all.errorTypes.map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
+
+  /* ── DOT / box bars (current week) ── */
+  el('dot-bars').innerHTML=[{name:'Abel & Cole',rate:D.ac.dot,color:C.ac},{name:'FF Bikes',rate:D.bikes.dot,color:C.bikes},{name:'GSG Global',rate:D.gsg.dot,color:C.gsg}].filter(x=>x.rate).map(x=>`<div class="bar-r"><div class="bl"><span>${x.name}</span><span>${x.rate}%</span></div><div class="bt"><div class="bf" style="width:${x.rate}%;background:${x.color}"></div></div></div>`).join('');
+  el('box-bars').innerHTML=[{name:'Abel & Cole',rate:D.ac.boxReturnRate,color:C.ac},{name:'FF Bikes',rate:D.bikes.boxReturnRate,color:C.bikes},{name:'GSG Global',rate:D.gsg.boxReturnRate,color:C.gsg}].filter(x=>x.rate).map(x=>`<div class="bar-r"><div class="bl"><span>${x.name}</span><span>${x.rate}%</span></div><div class="bt"><div class="bf" style="width:${Math.min(x.rate*3,100)}%;background:${x.color}"></div></div></div>`).join('');
+
+  /* ── Delivered split ── */
+  new Chart(el('chart-split'),{type:'doughnut',data:{labels:[`Not Delivered (${pct(D.all.notDeliveredErrors,totalErrors,0)})`,`Delivered with Error (${pct(D.all.deliveredErrors,totalErrors,0)})`],datasets:[{data:[D.all.notDeliveredErrors,D.all.deliveredErrors],backgroundColor:['#e0a060','#6aab6a']}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+
+  /* ── Day × Courier heatmap ── */
+  const heatCouriers=[
+    {label:'A&C',days:D.ac.depots?null:D.ac.days,dailyData:D.ac.days||[]},
+    {label:'Bikes',dailyData:D.bikes.days||[]},
+    {label:'GSG',dailyData:D.gsg.days||[]},
+    {label:'DPD',dailyData:D.dpd.days||[]},
+  ];
+  const allDayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const heatMap={};
+  [{key:'ac',data:D.ac.days||[]},{key:'bikes',data:D.bikes.days||[]},{key:'gsg',data:D.gsg.days||[]},{key:'dpd',data:D.dpd.days||[]}].forEach(({key,data})=>{
+    data.forEach(d=>{if(!heatMap[d.name])heatMap[d.name]={};heatMap[d.name][key]=+(d.errors/d.orders*100).toFixed(2);});
+  });
+  const presentDays=allDayNames.filter(d=>heatMap[d]);
+  const heatRows=presentDays.map(day=>{
+    const ac=heatMap[day]?.ac,bk=heatMap[day]?.bikes,gsg=heatMap[day]?.gsg,dpd=heatMap[day]?.dpd;
+    return`<tr>
+      <td class="day-lbl">${day}</td>
+      ${ac!==undefined?`<td style="background:${heatColor(ac)}">${heatText(ac)}</td>`:'<td class="na">—</td>'}
+      ${bk!==undefined?`<td style="background:${heatColor(bk)}">${heatText(bk)}</td>`:'<td class="na">—</td>'}
+      ${gsg!==undefined?`<td style="background:${heatColor(gsg)}">${heatText(gsg)}</td>`:'<td class="na">—</td>'}
+      ${dpd!==undefined?`<td style="background:${heatColor(dpd)}">${heatText(dpd)}</td>`:'<td class="na">—</td>'}
+    </tr>`;
+  }).join('');
+  el('heatmap-container').innerHTML=`<div class="heatmap-wrap"><table class="heatmap"><thead><tr><th class="day-th">Day</th><th>A&amp;C</th><th>Bikes</th><th>GSG</th><th>DPD</th></tr></thead><tbody>${heatRows}</tbody></table></div><p style="font-size:10px;color:#999;margin-top:6px">Error rate % · <span style="background:#a5d6a7;padding:1px 6px;border-radius:3px">≤0.5% good</span> <span style="background:#ffe082;padding:1px 6px;border-radius:3px">0.5–1.0% watch</span> <span style="background:#ef9a9a;padding:1px 6px;border-radius:3px">&gt;1.0% act</span></p>`;
+
+  /* ════════════ A&C PAGE ════════════ */
+  const acs=buildSummary('ac');
+  el('ac-insight').className=`insight ${acs.tone}`;
+  el('ac-insight').innerHTML=acs.text;
+  const acRate=D.ac.chargeableErrors/D.ac.totalOrders*100;
+  const acTotal=(D.ac.chargeableErrors+D.ac.nonChargeableErrors)/D.ac.totalOrders*100;
+  el('ac-kpis').innerHTML=`
+    <div class="kpi ${acRate<0.3?'':'warn'}"><div class="v">${D.ac.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div></div>
+    <div class="kpi ${acRate<0.3?'':'warn'}"><div class="v">${acRate.toFixed(2)}%</div>${kpiDelta(acRate-D.ac.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">${acTotal.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">${D.ac.chargeableErrors+D.ac.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">${D.ac.dot}%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">${D.ac.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
+
+  new Chart(el('chart-ac-depots'),{type:'bar',data:{labels:D.ac.depots.map(d=>d.name),datasets:[{label:'Error Rate %',data:D.ac.depots.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.ac.depots.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+  new Chart(el('chart-ac-trend'),{type:'line',data:{labels:R.weeks,datasets:[
+    {label:'Chargeable %',data:R.acCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'Total %',data:R.acTotal,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
+    targetDS(R.weeks,D.targets.ac,'Target'),
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  /* A&C depot trend */
+  const DT=D.depotTrends;
+  const depotColors=['#b5982a','#4a7c4a','#5b8fb9','#c0392b','#8e44ad','#16a085','#e67e22'];
+  new Chart(el('chart-ac-depot-trend'),{type:'line',data:{labels:DT.weeks,datasets:DT.depots.map((dep,i)=>({label:dep.name,data:dep.data,borderColor:depotColors[i%depotColors.length],pointRadius:3,tension:.3,fill:false,spanGaps:true,borderWidth:dep.name==='Kent'?2.5:1.5}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+
+  /* A&C error type trend + split */
+  errorTrendChart('chart-ac-error-trend', D.errorTrends.ac, D.errorTrends.weeks);
+  new Chart(el('chart-ac-etypes'),{type:'doughnut',data:{labels:D.ac.errorTypes.map(e=>e.label),datasets:[{data:D.ac.errorTypes.map(e=>e.count),backgroundColor:D.ac.errorTypes.map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
+
+  /* A&C tables */
+  const acDepotRows=D.ac.depots.map(d=>{const r=d.errors/d.orders*100;return`<tr><td>${d.name}</td><td>${d.orders.toLocaleString()}</td><td>${d.errors}</td><td class="${rateClass(r)}">${r.toFixed(2)}%</td><td>${d.dot}%</td></tr>`;}).join('');
+  const acTO=D.ac.depots.reduce((s,d)=>s+d.orders,0),acTE=D.ac.depots.reduce((s,d)=>s+d.errors,0);
+  el('ac-depot-table').innerHTML=`<table class="tbl"><thead><tr><th>Depot</th><th>Orders</th><th>Errors</th><th>Rate</th><th>DOT</th></tr></thead><tbody>${acDepotRows}<tr><td>Total</td><td>${acTO.toLocaleString()}</td><td>${acTE}</td><td class="${rateClass(acTE/acTO*100)}">${(acTE/acTO*100).toFixed(2)}%</td><td>${D.ac.dot}%</td></tr></tbody></table>`;
+  const acBRrows=D.ac.boxReturns.map(r=>`<tr><td>${r.day}</td><td>${r.delivered.toLocaleString()}</td><td>${r.returned.toLocaleString()}</td><td>${(r.returned/r.delivered*100).toFixed(2)}%</td></tr>`).join('');
+  const acBRd=D.ac.boxReturns.reduce((s,r)=>s+r.delivered,0),acBRr=D.ac.boxReturns.reduce((s,r)=>s+r.returned,0);
+  el('ac-box-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody>${acBRrows}<tr><td>Total</td><td>${acBRd.toLocaleString()}</td><td>${acBRr.toLocaleString()}</td><td>${(acBRr/acBRd*100).toFixed(2)}%</td></tr></tbody></table>`;
+
+  /* ════════════ GSG PAGE ════════════ */
+  const gsgs=buildSummary('gsg');
+  el('gsg-insight').className=`insight ${gsgs.tone}`;
+  el('gsg-insight').innerHTML=gsgs.text;
+  const gsgRate=D.gsg.chargeableErrors/D.gsg.totalOrders*100;
+  const gsgTotalR=(D.gsg.chargeableErrors+D.gsg.nonChargeableErrors)/D.gsg.totalOrders*100;
+  el('gsg-kpis').innerHTML=`
+    <div class="kpi"><div class="v">${D.gsg.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div></div>
+    <div class="kpi ${gsgRate>0.6?'warn':''}"><div class="v">${gsgRate.toFixed(2)}%</div>${kpiDelta(gsgRate-D.gsg.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">${gsgTotalR.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">${D.gsg.chargeableErrors+D.gsg.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">${D.gsg.dot}%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">${D.gsg.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
+
+  const gsgDrv=[...D.gsg.drivers].map(d=>({...d,rate:+(d.chargeable/d.deliveries*100).toFixed(2)})).sort((a,b)=>b.rate-a.rate);
+  new Chart(el('chart-gsg-drivers'),{type:'bar',data:{labels:gsgDrv.map(d=>d.name),datasets:[{label:'Error Rate %',data:gsgDrv.map(d=>d.rate),backgroundColor:gsgDrv.map(d=>rateColor(d.rate))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  new Chart(el('chart-gsg-trend'),{type:'line',data:{labels:R.weeks,datasets:[
+    {label:'Chargeable %',data:R.gsgCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'Total %',data:R.gsgTotal,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
+    targetDS(R.weeks,D.targets.gsg,'Target'),
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  /* GSG driver trend */
+  const drvTrend=D.driverTrends;
+  new Chart(el('chart-gsg-driver-trend'),{type:'line',data:{labels:drvTrend.weeks,datasets:drvTrend.drivers.map((drv,i)=>({label:drv.name,data:drv.data,borderColor:TREND_COLORS[i%TREND_COLORS.length],pointRadius:4,tension:.3,fill:false,spanGaps:true,borderWidth:drv.name==='STANISLAVSTEPANENCO'?2.5:1.5}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+
+  /* GSG error type trend + split */
+  errorTrendChart('chart-gsg-error-trend', D.errorTrends.gsg, D.errorTrends.weeks);
+  new Chart(el('chart-gsg-etypes'),{type:'doughnut',data:{labels:D.gsg.errorTypes.map(e=>e.label),datasets:[{data:D.gsg.errorTypes.map(e=>e.count),backgroundColor:D.gsg.errorTypes.map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
+
+  /* GSG tables */
+  const gsgDayRows=D.gsg.days.map(d=>{const r=d.errors/d.orders*100;return`<tr><td>${d.name}</td><td>${d.orders.toLocaleString()}</td><td>${d.errors}</td><td class="${rateClass(r)}">${r.toFixed(2)}%</td></tr>`;}).join('');
+  const gsgTO=D.gsg.days.reduce((s,d)=>s+d.orders,0),gsgTE=D.gsg.days.reduce((s,d)=>s+d.errors,0);
+  el('gsg-day-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody>${gsgDayRows}<tr><td>Total</td><td>${gsgTO.toLocaleString()}</td><td>${gsgTE}</td><td class="${rateClass(gsgTE/gsgTO*100)}">${(gsgTE/gsgTO*100).toFixed(2)}%</td></tr></tbody></table>`;
+  const gsgBRrows=D.gsg.boxReturns.map(r=>`<tr><td>${r.day}</td><td>${r.delivered.toLocaleString()}</td><td>${r.returned?r.returned.toLocaleString():'—'}</td><td>${r.returned?(r.returned/r.delivered*100).toFixed(2)+'%':'—'}</td></tr>`).join('');
+  const gsgBRd=D.gsg.boxReturns.reduce((s,r)=>s+r.delivered,0),gsgBRr=D.gsg.boxReturns.reduce((s,r)=>s+r.returned,0);
+  el('gsg-box-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody>${gsgBRrows}<tr><td>Total</td><td>${gsgBRd.toLocaleString()}</td><td>${gsgBRr.toLocaleString()}</td><td>${(gsgBRr/gsgBRd*100).toFixed(2)}%</td></tr></tbody></table>`;
+
+  /* ════════════ BIKES PAGE ════════════ */
+  const bkS=buildSummary('bikes');
+  el('bikes-insight').className=`insight ${bkS.tone}`;
+  el('bikes-insight').innerHTML=bkS.text;
+  const bkRate=D.bikes.chargeableErrors/D.bikes.totalOrders*100;
+  const bkTotalR=(D.bikes.chargeableErrors+D.bikes.nonChargeableErrors)/D.bikes.totalOrders*100;
+  el('bikes-kpis').innerHTML=`
+    <div class="kpi"><div class="v">${D.bikes.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div></div>
+    <div class="kpi ${bkRate>0.4?'warn':''}"><div class="v">${bkRate.toFixed(2)}%</div>${kpiDelta(bkRate-D.bikes.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">${bkTotalR.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">${D.bikes.chargeableErrors+D.bikes.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">${D.bikes.dot}%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">${D.bikes.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
+
+  new Chart(el('chart-bikes-days'),{type:'bar',data:{labels:D.bikes.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.bikes.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.bikes.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+
+  new Chart(el('chart-bikes-trend'),{type:'line',data:{labels:R.weeks,datasets:[
+    {label:'Chargeable %',data:R.bikesCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'Total %',data:R.bikesTotal,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
+    targetDS(R.weeks,D.targets.bikes,'Target'),
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  new Chart(el('chart-bikes-etypes'),{type:'doughnut',data:{labels:D.bikes.errorTypes.map(e=>e.label),datasets:[{data:D.bikes.errorTypes.map(e=>e.count),backgroundColor:D.bikes.errorTypes.map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
+
+  errorTrendChart('chart-bikes-error-trend', D.errorTrends.bikes, D.errorTrends.weeks);
+
+  const bkDayRows=D.bikes.days.map(d=>{const r=d.errors/d.orders*100;return`<tr><td>${d.name}</td><td>${d.orders.toLocaleString()}</td><td>${d.errors}</td><td class="${rateClass(r)}">${r.toFixed(2)}%</td></tr>`;}).join('');
+  const bkTO=D.bikes.days.reduce((s,d)=>s+d.orders,0),bkTE=D.bikes.days.reduce((s,d)=>s+d.errors,0);
+  el('bikes-day-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody>${bkDayRows}<tr><td>Total</td><td>${bkTO.toLocaleString()}</td><td>${bkTE}</td><td class="${rateClass(bkTE/bkTO*100)}">${(bkTE/bkTO*100).toFixed(2)}%</td></tr></tbody></table>`;
+  const bkBRrows=D.bikes.boxReturns.map(r=>`<tr><td>${r.day}</td><td>${r.delivered.toLocaleString()}</td><td>${r.returned?r.returned.toLocaleString():'—'}</td><td class="${r.returned?'':'b'}">${r.returned?(r.returned/r.delivered*100).toFixed(2)+'%':'0.00%'}</td></tr>`).join('');
+  const bkBRd=D.bikes.boxReturns.reduce((s,r)=>s+r.delivered,0),bkBRr=D.bikes.boxReturns.reduce((s,r)=>s+r.returned,0);
+  el('bikes-box-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody>${bkBRrows}<tr><td>Total</td><td>${bkBRd.toLocaleString()}</td><td>${bkBRr.toLocaleString()}</td><td>${(bkBRr/bkBRd*100).toFixed(2)}%</td></tr></tbody></table>`;
+
+  /* ════════════ DPD PAGE ════════════ */
+  const dpdS=buildSummary('dpd');
+  el('dpd-insight').className=`insight ${dpdS.tone}`;
+  el('dpd-insight').innerHTML=dpdS.text;
+  const dpdRate=D.dpd.chargeableErrors/D.dpd.totalOrders*100;
+  const dpdTotalR=(D.dpd.chargeableErrors+D.dpd.nonChargeableErrors)/D.dpd.totalOrders*100;
+  const dpdWorstDay=[...D.dpd.days].sort((a,b)=>(b.errors/b.orders)-(a.errors/a.orders))[0];
+  el('dpd-kpis').innerHTML=`
+    <div class="kpi bad"><div class="v">${D.dpd.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div></div>
+    <div class="kpi bad"><div class="v">${dpdRate.toFixed(2)}%</div>${kpiDelta(dpdRate-D.dpd.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
+    <div class="kpi bad"><div class="v">${dpdTotalR.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi bad"><div class="v">${D.dpd.chargeableErrors+D.dpd.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi bad"><div class="v">${D.dpd.chargeableErrors}</div><div class="l">Chargeable Errors</div></div>
+    <div class="kpi bad"><div class="v">${dpdWorstDay.name}</div><div class="l">Worst Day (${(dpdWorstDay.errors/dpdWorstDay.orders*100).toFixed(2)}%)</div></div>`;
+
+  new Chart(el('chart-dpd-days'),{type:'bar',data:{labels:D.dpd.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.dpd.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.dpd.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+
+  new Chart(el('chart-dpd-trend'),{type:'line',data:{labels:R.weeks,datasets:[
+    {label:'Chargeable %',data:R.dpdCharge,borderColor:C.dpd,pointRadius:4,tension:.3,fill:false,spanGaps:true},
+    {label:'Total %',data:R.dpdTotal,borderColor:'#e07070',pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
+    targetDS(R.weeks,D.targets.dpd,'Target'),
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+
+  new Chart(el('chart-dpd-etypes'),{type:'doughnut',data:{labels:D.dpd.errorTypes.map(e=>e.label),datasets:[{data:D.dpd.errorTypes.map(e=>e.count),backgroundColor:D.dpd.errorTypes.map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
+
+  errorTrendChart('chart-dpd-error-trend', D.errorTrends.dpd, D.errorTrends.weeks);
+
+  const dpdDayRows=D.dpd.days.map(d=>{const r=d.errors/d.orders*100;return`<tr><td>${d.name}</td><td>${d.orders.toLocaleString()}</td><td>${d.errors}</td><td class="${rateClass(r)}">${r.toFixed(2)}%</td></tr>`;}).join('');
+  const dpdTO=D.dpd.days.reduce((s,d)=>s+d.orders,0),dpdTE=D.dpd.days.reduce((s,d)=>s+d.errors,0);
+  el('dpd-day-table').innerHTML=`<table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody>${dpdDayRows}<tr><td>Total</td><td>${dpdTO.toLocaleString()}</td><td>${dpdTE}</td><td class="${rateClass(dpdTE/dpdTO*100)}">${(dpdTE/dpdTO*100).toFixed(2)}%</td></tr></tbody></table>`;
+
+} // end renderDashboard
+window.addEventListener('DOMContentLoaded', renderDashboard);
+</script>
+
+<!-- ═══════════════════ CSV PARSER ═══════════════════ -->
+<script>
+function parseCSV(text){
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'));
+  function parseLine(line){const cells=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){cells.push(cur.trim());cur='';}else{cur+=ch;}}cells.push(cur.trim());return cells;}
+  const rows=lines.map(parseLine);
+  const sections={};
+  rows.forEach(r=>{const key=r[0];if(!key)return;if(!sections[key])sections[key]=[];sections[key].push(r.slice(1));});
+  const n=(v,fb=null)=>{const f=parseFloat(v);return isNaN(f)?fb:f;};
+  const rv=key=>(sections[key]?.[0]||[]).map(v=>n(v));
+
+  /* Error lookup */
+  const errorLookup=new Map();
+  (sections['ERROR_LOOKUP']||[]).forEach(r=>{if(r[0])errorLookup.set(r[0].trim(),{chargeable:r[1]==='Y',delivered:r[2]==='Y'});});
+  function classifyErrors(et){let c=0,nc=0,d=0,nd=0;et.forEach(e=>{const info=errorLookup.get(e.label);if(!info)return;if(info.chargeable)c+=e.count;else nc+=e.count;if(info.delivered)d+=e.count;else nd+=e.count;});return{chargeable:c,nonChargeable:nc,delivered:d,notDelivered:nd};}
+  function enrichET(et){return et.map(e=>{const info=errorLookup.get(e.label)||{chargeable:null,delivered:null};return{...e,...info};});}
+
+  const D={};
+  D.week=parseInt(sections['WEEK']?.[0]?.[0]||0);
+
+  /* Targets */
+  D.targets={ac:0.30,bikes:0.30,gsg:0.40,dpd:1.20};
+  (sections['TARGET_CHARGE']||[]).forEach(r=>{if(r[0]&&D.targets[r[0]]!==undefined)D.targets[r[0]]=n(r[1],D.targets[r[0]]);});
+
+  /* Rolling */
+  const rWeeks=sections['ROLLING_WEEKS']?.[0]||[];
+  D.rolling={
+    weeks:rWeeks.filter(Boolean),
+    acCharge:rv('ROLLING_AC_CHARGE').length?rv('ROLLING_AC_CHARGE'):rv('ROLLING_AC'),
+    acTotal:rv('ROLLING_AC_TOTAL'),
+    bikesCharge:rv('ROLLING_BIKES_CHARGE').length?rv('ROLLING_BIKES_CHARGE'):rv('ROLLING_BIKES'),
+    bikesTotal:rv('ROLLING_BIKES_TOTAL'),
+    gsgCharge:rv('ROLLING_GSG_CHARGE').length?rv('ROLLING_GSG_CHARGE'):rv('ROLLING_GSG'),
+    gsgTotal:rv('ROLLING_GSG_TOTAL'),
+    dpdCharge:rv('ROLLING_DPD_CHARGE').length?rv('ROLLING_DPD_CHARGE'):rv('ROLLING_DPD'),
+    dpdTotal:rv('ROLLING_DPD_TOTAL'),
+    allCharge:rv('ROLLING_ALL_CHARGE').length?rv('ROLLING_ALL_CHARGE'):rv('ROLLING_TOTAL'),
+    allTotal:rv('ROLLING_ALL_TOTAL'),
+  };
+
+  /* Rolling DOT */
+  const dotWeeks=sections['ROLLING_DOT_WEEKS']?.[0]||[];
+  D.rollingDot={weeks:dotWeeks.filter(Boolean),ac:rv('ROLLING_AC_DOT'),bikes:rv('ROLLING_BIKES_DOT'),gsg:rv('ROLLING_GSG_DOT')};
+
+  /* Rolling box return */
+  const boxWeeks=sections['ROLLING_BOX_WEEKS']?.[0]||[];
+  D.rollingBox={weeks:boxWeeks.filter(Boolean),ac:rv('ROLLING_AC_BOX'),bikes:rv('ROLLING_BIKES_BOX'),gsg:rv('ROLLING_GSG_BOX')};
+
+  /* Error trends */
+  const etWeeks=sections['ERROR_TREND_WEEKS']?.[0]||[];
+  function buildETrends(prefix){return(sections[prefix]||[]).map(r=>({label:r[0],data:r.slice(1).map(v=>n(v))}));}
+  D.errorTrends={weeks:etWeeks.filter(Boolean),ac:buildETrends('AC_ERROR_TREND'),gsg:buildETrends('GSG_ERROR_TREND'),bikes:buildETrends('BIKES_ERROR_TREND'),dpd:buildETrends('DPD_ERROR_TREND')};
+
+  /* Depot trends */
+  const depotWeeks=sections['DEPOT_TREND_WEEKS']?.[0]||[];
+  D.depotTrends={weeks:depotWeeks.filter(Boolean),depots:(sections['DEPOT_TREND']||[]).map(r=>({name:r[0],data:r.slice(1).map(v=>n(v))}))};
+
+  /* Driver trends */
+  const driverWeeks=sections['DRIVER_TREND_WEEKS']?.[0]||[];
+  D.driverTrends={weeks:driverWeeks.filter(Boolean),drivers:(sections['DRIVER_TREND']||[]).map(r=>({name:r[0],data:r.slice(1).map(v=>n(v))}))};
+
+  /* Courier helper */
+  function buildCourier(key,errorKey){
+    const cs=(sections['COURIER_SUMMARY']||[]).find(r=>r[0]===key)||[];
+    const rawErrors=(sections[errorKey]||[]).map(r=>({label:r[0],count:parseInt(r[1])||0}));
+    const totals=classifyErrors(rawErrors);
+    return{totalOrders:parseInt(cs[1])||0,prevWeekChargeable:n(cs[2],0),dot:n(cs[3],null),boxReturnRate:n(cs[4],null),notes:cs[5]||'',chargeableErrors:totals.chargeable,nonChargeableErrors:totals.nonChargeable,deliveredErrors:totals.delivered,notDeliveredErrors:totals.notDelivered,errorTypes:enrichET(rawErrors)};
+  }
+
+  D.ac={...buildCourier('ac','AC_ERROR'),days:[],depots:(sections['AC_DEPOT']||[]).map(r=>({name:r[0],orders:parseInt(r[1])||0,errors:parseInt(r[2])||0,dot:n(r[3],null)})),boxReturns:(sections['AC_BOX_RETURNS']||[]).map(r=>({day:r[0],delivered:parseInt(r[1])||0,returned:parseInt(r[2])||0}))};
+  D.gsg={...buildCourier('gsg','GSG_ERROR'),days:(sections['GSG_DAILY']||[]).map(r=>({name:r[0],orders:parseInt(r[1])||0,errors:parseInt(r[2])||0})),boxReturns:(sections['GSG_BOX_RETURNS']||[]).map(r=>({day:r[0],delivered:parseInt(r[1])||0,returned:parseInt(r[2])||0})),drivers:(sections['GSG_DRIVER']||[]).map(r=>({name:r[0],chargeable:parseInt(r[1])||0,deliveries:parseInt(r[2])||0}))};
+  D.bikes={...buildCourier('bikes','BIKES_ERROR'),days:(sections['BIKES_DAILY']||[]).map(r=>({name:r[0],orders:parseInt(r[1])||0,errors:parseInt(r[2])||0})),boxReturns:(sections['BIKES_BOX_RETURNS']||[]).map(r=>({day:r[0],delivered:parseInt(r[1])||0,returned:parseInt(r[2])||0}))};
+  D.dpd={...buildCourier('dpd','DPD_ERROR'),days:(sections['DPD_DAILY']||[]).map(r=>({name:r[0],orders:parseInt(r[1])||0,errors:parseInt(r[2])||0}))};
+
+  const aC=D.ac.chargeableErrors+D.bikes.chargeableErrors+D.gsg.chargeableErrors+D.dpd.chargeableErrors;
+  const aNC=D.ac.nonChargeableErrors+D.bikes.nonChargeableErrors+D.gsg.nonChargeableErrors+D.dpd.nonChargeableErrors;
+  const aD=D.ac.deliveredErrors+D.bikes.deliveredErrors+D.gsg.deliveredErrors+D.dpd.deliveredErrors;
+  const aND=D.ac.notDeliveredErrors+D.bikes.notDeliveredErrors+D.gsg.notDeliveredErrors+D.dpd.notDeliveredErrors;
+  const aTO=D.ac.totalOrders+D.bikes.totalOrders+D.gsg.totalOrders+D.dpd.totalOrders;
+  const errMap=new Map();
+  [D.ac,D.bikes,D.gsg,D.dpd].forEach(c=>c.errorTypes.forEach(e=>{const ex=errMap.get(e.label)||{label:e.label,count:0,chargeable:e.chargeable,delivered:e.delivered};ex.count+=e.count;errMap.set(e.label,ex);}));
+  D.all={totalOrders:aTO,chargeableErrors:aC,nonChargeableErrors:aNC,deliveredErrors:aD,notDeliveredErrors:aND,prevWeekChargeable:D.rolling.allCharge.slice(-2,-1)[0]||0,days:(sections['ALL_DAILY']||[]).map(r=>({name:r[0],orders:parseInt(r[1])||0,errors:parseInt(r[2])||0})),errorTypes:[...errMap.values()].sort((a,b)=>b.count-a.count)};
+  return D;
+}
+
+function exportHTML() {
+  const week = WEEK_DATA.week;
+  const dataStr = '/* DATA_START */\nconst WEEK_DATA = ' + JSON.stringify(WEEK_DATA, null, 2) + ';\n/* DATA_END */';
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  html = html.replace(/\/\* DATA_START \*\/[\s\S]*?\/\* DATA_END \*\//, dataStr);
+  const blob = new Blob([html], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FF_Logistics_WK${week}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function handleCSVUpload(event){
+  const file=event.target.files[0];if(!file)return;
+  const status=document.getElementById('upload-status');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=parseCSV(e.target.result);
+      if(!parsed.week||parsed.all.totalOrders===0)throw new Error('Could not read data — check CSV format');
+      Object.assign(WEEK_DATA,parsed);
+      Object.values(Chart.instances||{}).forEach(c=>{try{c.destroy();}catch(ex){}});
+      renderDashboard();
+      status.textContent=`✓ WK${parsed.week} loaded successfully`;
+      status.className='ok';
+    }catch(err){status.textContent='✕ '+err.message;status.className='err';}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+</script>
+
+<!-- ═══════════════════ MARKUP ═══════════════════ -->
+
+<div class="header">
+  <div class="header-left">
+    <h1>Freddie's Flowers — Logistics KPI Report</h1>
+    <p>Week <span id="hdr-week">Week 21</span> · Abel &amp; Cole · FF Bikes · GSG Global · DPD</p>
+  </div>
+  <div class="header-right">
+    <div class="hkpi"><div class="val" id="hdr-orders">26,633</div><div class="lbl">Total Orders</div></div>
+    <div class="hkpi"><div class="val" id="hdr-charge">0.72%</div><div class="lbl">Chargeable Rate</div></div>
+    <div class="hkpi"><div class="val" id="hdr-total">0.90%</div><div class="lbl">Total Error Rate</div></div>
+  </div>
+</div>
+
+<div class="upload-bar">
+  <label for="csv-upload">📂 Load CSV<input type="file" id="csv-upload" accept=".csv" onchange="handleCSVUpload(event)"></label>
+  <span id="upload-status" class="idle">Upload FF_Logistics_Weekly_Template.csv to refresh</span>
+  <button class="export-btn" onclick="exportHTML()" title="Download this dashboard with current data baked in — ready to share or publish">⬇ Export &amp; Share</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('overview',this)">Overview</div>
+  <div class="tab" onclick="showPage('ac',this)">Abel &amp; Cole</div>
+  <div class="tab" onclick="showPage('gsg',this)">GSG Global</div>
+  <div class="tab" onclick="showPage('bikes',this)">FF Bikes</div>
+  <div class="tab" onclick="showPage('dpd',this)">DPD</div>
+</div>
+
+<!-- ══ OVERVIEW ══ -->
+<div class="page active" id="page-overview">
+  <div id="overview-insight" class="insight warn">Error rate relatively stable at <strong>0.72% chargeable</strong> (-0.05pp vs last week). Tuesday was the worst day at 1.02%; Saturday the best at 0.81%. Top error type: <strong>Photo shows wrong address</strong> (33 cases). <strong>A&amp;C</strong> was the best-performing courier at 0.26%; <strong>DPD</strong> the highest at 1.38%.</div>
+  <div class="kpi-row">
+    <div class="kpi" id="kpi-orders"><div class="v">26,633</div><div class="l">Total Orders</div></div>
+    <div class="kpi" id="kpi-total-err"><div class="v">240</div><div class="l">Total Errors</div></div>
+    <div class="kpi warn" id="kpi-charge"><div class="v">0.72%</div><span class="delta down">▼ 0.05pp vs WK20</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi" id="kpi-notdel"><div class="v">159</div><div class="l">Not Delivered</div></div>
+    <div class="kpi warn" id="kpi-delivered"><div class="v">81</div><div class="l">Delivered Errors</div></div>
+    <div class="kpi bad" id="kpi-worst-day"><div class="v">Tuesday</div><div class="l">Worst Day (1.02%)</div></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Courier Error Rates — Total vs Chargeable</h3><canvas id="chart-compare" height="857" style="display: block; box-sizing: border-box; height: 428px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Rolling Chargeable Error Rate by Courier</h3><canvas id="chart-rolling" height="857" width="1286" style="display: block; box-sizing: border-box; height: 428px; width: 643px;"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>DOT — Delivered on Time Trend</h3><canvas id="chart-dot-rolling" height="857" width="1286" style="display: block; box-sizing: border-box; height: 428px; width: 643px;"></canvas></div>
+    <div class="card"><h3>Box Return Rate Trend</h3><canvas id="chart-box-rolling" height="857" width="1286" style="display: block; box-sizing: border-box; height: 428px; width: 643px;"></canvas></div>
+  </div>
+  <div class="row21">
+    <div class="card"><h3>Error Rate by Day of Week</h3><canvas id="chart-days" height="1043" width="1738" style="display: block; box-sizing: border-box; height: 521px; width: 869px;"></canvas></div>
+    <div class="card"><h3>Top Error Types (All Couriers)</h3><canvas id="chart-etypes" height="833" width="833" style="display: block; box-sizing: border-box; height: 416px; width: 416px;"></canvas></div>
+  </div>
+  <div class="row1">
+    <div class="card">
+      <h3>Day × Courier Error Rate Heatmap</h3>
+      <div id="heatmap-container"><div class="heatmap-wrap"><table class="heatmap"><thead><tr><th class="day-th">Day</th><th>A&amp;C</th><th>Bikes</th><th>GSG</th><th>DPD</th></tr></thead><tbody><tr>
+      <td class="day-lbl">Monday</td>
+      <td class="na">—</td>
+      <td style="background:#ffe082">0.95%</td>
+      <td style="background:#ffe082">0.92%</td>
+      <td style="background:#ffab91">1.19%</td>
+    </tr><tr>
+      <td class="day-lbl">Tuesday</td>
+      <td class="na">—</td>
+      <td style="background:#c8e6c9">0.18%</td>
+      <td style="background:#a5d6a7">0.46%</td>
+      <td style="background:#e57373">2.33%</td>
+    </tr><tr>
+      <td class="day-lbl">Wednesday</td>
+      <td class="na">—</td>
+      <td style="background:#ffe082">0.81%</td>
+      <td style="background:#ffab91">1.13%</td>
+      <td style="background:#ef9a9a">1.96%</td>
+    </tr><tr>
+      <td class="day-lbl">Thursday</td>
+      <td class="na">—</td>
+      <td style="background:#fff9c4">0.62%</td>
+      <td style="background:#fff9c4">0.67%</td>
+      <td style="background:#ffab91">1.35%</td>
+    </tr><tr>
+      <td class="day-lbl">Friday</td>
+      <td class="na">—</td>
+      <td style="background:#a5d6a7">0.38%</td>
+      <td style="background:#c8e6c9">0.25%</td>
+      <td style="background:#ef9a9a">1.56%</td>
+    </tr><tr>
+      <td class="day-lbl">Saturday</td>
+      <td class="na">—</td>
+      <td class="na">—</td>
+      <td class="na">—</td>
+      <td style="background:#ffe082">0.81%</td>
+    </tr><tr>
+      <td class="day-lbl">Sunday</td>
+      <td class="na">—</td>
+      <td class="na">—</td>
+      <td class="na">—</td>
+      <td style="background:#ffe082">0.86%</td>
+    </tr></tbody></table></div><p style="font-size:10px;color:#999;margin-top:6px">Error rate % · <span style="background:#a5d6a7;padding:1px 6px;border-radius:3px">≤0.5% good</span> <span style="background:#ffe082;padding:1px 6px;border-radius:3px">0.5–1.0% watch</span> <span style="background:#ef9a9a;padding:1px 6px;border-radius:3px">&gt;1.0% act</span></p></div>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Delivered vs Not Delivered</h3><div style="max-width:240px;margin:0 auto"><canvas id="chart-split" height="480" width="480" style="display: block; box-sizing: border-box; height: 240px; width: 240px;"></canvas></div></div>
+    <div class="card">
+      <h3>DOT &amp; Box Return Rates — This Week</h3>
+      <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--green-dark);margin-bottom:8px">Delivered on Time</p>
+      <div id="dot-bars"><div class="bar-r"><div class="bl"><span>Abel &amp; Cole</span><span>92.61%</span></div><div class="bt"><div class="bf" style="width:92.61%;background:#b5982a"></div></div></div><div class="bar-r"><div class="bl"><span>FF Bikes</span><span>94%</span></div><div class="bt"><div class="bf" style="width:94%;background:#4a7c4a"></div></div></div><div class="bar-r"><div class="bl"><span>GSG Global</span><span>93%</span></div><div class="bt"><div class="bf" style="width:93%;background:#5b8fb9"></div></div></div></div>
+      <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--green-dark);margin:14px 0 8px">Box Return Rate</p>
+      <div id="box-bars"><div class="bar-r"><div class="bl"><span>Abel &amp; Cole</span><span>20.68%</span></div><div class="bt"><div class="bf" style="width:62.04%;background:#b5982a"></div></div></div><div class="bar-r"><div class="bl"><span>FF Bikes</span><span>26.61%</span></div><div class="bt"><div class="bf" style="width:79.83%;background:#4a7c4a"></div></div></div><div class="bar-r"><div class="bl"><span>GSG Global</span><span>26.75%</span></div><div class="bt"><div class="bf" style="width:80.25%;background:#5b8fb9"></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ A&C ══ -->
+<div class="page" id="page-ac">
+  <div id="ac-insight" class="insight good">Error rate relatively stable at <strong>0.26% chargeable</strong> (-0.10pp vs last week). Top error type: <strong>Photo shows wrong address</strong> (8 cases). DOT: 92.61%. Box return rate: 20.68%. 8 wrong address deliveries is a great improvement — pinpoint work by the A&amp;C team is paying off.</div>
+  <div class="kpi-row" id="ac-kpis">
+    <div class="kpi "><div class="v">8,428</div><div class="l">Total Orders</div></div>
+    <div class="kpi "><div class="v">0.26%</div><span class="delta down">▼ 0.10pp vs WK20</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">0.38%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">32</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">92.61%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">20.68%</div><div class="l">Box Return Rate</div></div></div>
+  <div class="row2">
+    <div class="card"><h3>Error Rate by Depot</h3><canvas id="chart-ac-depots" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-ac-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row3">
+    <div class="card"><h3>Depot Error Rate Trend (WK15–)</h3><canvas id="chart-ac-depot-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-ac-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-ac-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card scroll-wrap"><h3>Depot Breakdown</h3><div id="ac-depot-table"><table class="tbl"><thead><tr><th>Depot</th><th>Orders</th><th>Errors</th><th>Rate</th><th>DOT</th></tr></thead><tbody><tr><td>Andover</td><td>952</td><td>2</td><td class="g">0.21%</td><td>90%</td></tr><tr><td>Ashby</td><td>1,600</td><td>4</td><td class="g">0.25%</td><td>95%</td></tr><tr><td>Cambridge</td><td>1,111</td><td>5</td><td class="g">0.45%</td><td>88%</td></tr><tr><td>Doncaster</td><td>1,275</td><td>6</td><td class="g">0.47%</td><td>89.21%</td></tr><tr><td>Kent</td><td>761</td><td>8</td><td class="b">1.05%</td><td>92.67%</td></tr><tr><td>Sharpness</td><td>1,351</td><td>5</td><td class="g">0.37%</td><td>95.99%</td></tr><tr><td>Warrington</td><td>1,378</td><td>2</td><td class="g">0.15%</td><td>96.67%</td></tr><tr><td>Total</td><td>8,428</td><td>32</td><td class="g">0.38%</td><td>92.61%</td></tr></tbody></table></div></div>
+    <div class="card"><h3>Box Returns by Day</h3><div id="ac-box-table"><table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,552</td><td>345</td><td>22.23%</td></tr><tr><td>Tuesday</td><td>1,743</td><td>311</td><td>17.84%</td></tr><tr><td>Wednesday</td><td>1,863</td><td>406</td><td>21.79%</td></tr><tr><td>Thursday</td><td>1,698</td><td>307</td><td>18.08%</td></tr><tr><td>Friday</td><td>1,572</td><td>374</td><td>23.79%</td></tr><tr><td>Total</td><td>8,428</td><td>1,743</td><td>20.68%</td></tr></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ══ GSG ══ -->
+<div class="page" id="page-gsg">
+  <div id="gsg-insight" class="insight good">Error rate relatively stable at <strong>0.51% chargeable</strong> (+0.15pp vs last week). Wednesday was the worst day at 1.13%; Friday the best at 0.25%. Top error type: <strong>Box Not on Van</strong> (12 cases). DOT: 93%. Box return rate: 26.75%. 6 of STANISLAVSTEPANENCO's errors are a loading fault from consolidated pallets — not the driver's fault.</div>
+  <div class="kpi-row" id="gsg-kpis">
+    <div class="kpi"><div class="v">5,909</div><div class="l">Total Orders</div></div>
+    <div class="kpi "><div class="v">0.51%</div><span class="delta up">▲ 0.15pp vs WK20</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">0.69%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">41</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">93%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">26.75%</div><div class="l">Box Return Rate</div></div></div>
+  <div class="row2">
+    <div class="card"><h3>Driver Error Rates — This Week</h3><canvas id="chart-gsg-drivers" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-gsg-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row3">
+    <div class="card"><h3>Key Driver Chargeable Rate Trend</h3><canvas id="chart-gsg-driver-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-gsg-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-gsg-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Errors by Day</h3><div id="gsg-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,197</td><td>11</td><td class="w">0.92%</td></tr><tr><td>Tuesday</td><td>1,091</td><td>5</td><td class="g">0.46%</td></tr><tr><td>Wednesday</td><td>1,240</td><td>14</td><td class="b">1.13%</td></tr><tr><td>Thursday</td><td>1,186</td><td>8</td><td class="w">0.67%</td></tr><tr><td>Friday</td><td>1,195</td><td>3</td><td class="g">0.25%</td></tr><tr><td>Total</td><td>5,909</td><td>41</td><td class="w">0.69%</td></tr></tbody></table></div></div>
+    <div class="card"><h3>Box Returns by Day</h3><div id="gsg-box-table"><table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,126</td><td>419</td><td>37.21%</td></tr><tr><td>Tuesday</td><td>1,129</td><td>420</td><td>37.20%</td></tr><tr><td>Wednesday</td><td>1,186</td><td>326</td><td>27.49%</td></tr><tr><td>Thursday</td><td>1,255</td><td>409</td><td>32.59%</td></tr><tr><td>Friday</td><td>1,188</td><td>—</td><td>—</td></tr><tr><td>Total</td><td>5,884</td><td>1,574</td><td>26.75%</td></tr></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ══ BIKES ══ -->
+<div class="page" id="page-bikes">
+  <div id="bikes-insight" class="insight good">Error rate relatively stable at <strong>0.35% chargeable</strong> (+0.04pp vs last week). Monday was the worst day at 0.95%; Tuesday the best at 0.18%. Top error type: <strong>Stolen</strong> (8 cases). DOT: 94%. Box return rate: 26.61%. Lydia had the highest individual error count this week.</div>
+  <div class="kpi-row" id="bikes-kpis">
+    <div class="kpi"><div class="v">5,095</div><div class="l">Total Orders</div></div>
+    <div class="kpi "><div class="v">0.35%</div><span class="delta flat">≈ flat vs last week</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi"><div class="v">0.57%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi"><div class="v">29</div><div class="l">Total Errors</div></div>
+    <div class="kpi"><div class="v">94%</div><div class="l">DOT</div></div>
+    <div class="kpi"><div class="v">26.61%</div><div class="l">Box Return Rate</div></div></div>
+  <div class="row2">
+    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-bikes-days" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-bikes-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-bikes-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-bikes-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Errors by Day</h3><div id="bikes-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>840</td><td>8</td><td class="w">0.95%</td></tr><tr><td>Tuesday</td><td>1,084</td><td>2</td><td class="g">0.18%</td></tr><tr><td>Wednesday</td><td>986</td><td>8</td><td class="w">0.81%</td></tr><tr><td>Thursday</td><td>1,136</td><td>7</td><td class="w">0.62%</td></tr><tr><td>Friday</td><td>1,049</td><td>4</td><td class="g">0.38%</td></tr><tr><td>Total</td><td>5,095</td><td>29</td><td class="w">0.57%</td></tr></tbody></table></div></div>
+    <div class="card"><h3>Box Returns by Day</h3><div id="bikes-box-table"><table class="tbl"><thead><tr><th>Day</th><th>Delivered</th><th>Returned</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>840</td><td>—</td><td class="b">0.00%</td></tr><tr><td>Tuesday</td><td>1,084</td><td>704</td><td class="">64.94%</td></tr><tr><td>Wednesday</td><td>986</td><td>—</td><td class="b">0.00%</td></tr><tr><td>Thursday</td><td>1,136</td><td>652</td><td class="">57.39%</td></tr><tr><td>Friday</td><td>1,049</td><td>—</td><td class="b">0.00%</td></tr><tr><td>Total</td><td>5,095</td><td>1,356</td><td>26.61%</td></tr></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ══ DPD ══ -->
+<div class="page" id="page-dpd">
+  <div id="dpd-insight" class="insight good"><strong>Improvement this week</strong> — chargeable rate down 0.15pp to 1.38%. Tuesday was the worst day at 2.33%; Saturday the best at 0.81%. Top error type: <strong>Parcel Held (DPD)</strong> (19 cases). 31 total damage-related issues ongoing — box packaging concern to monitor.</div>
+  <div class="kpi-row" id="dpd-kpis">
+    <div class="kpi bad"><div class="v">7,256</div><div class="l">Total Orders</div></div>
+    <div class="kpi bad"><div class="v">1.38%</div><span class="delta down">▼ 0.15pp vs WK20</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi bad"><div class="v">1.57%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi bad"><div class="v">114</div><div class="l">Total Errors</div></div>
+    <div class="kpi bad"><div class="v">100</div><div class="l">Chargeable Errors</div></div>
+    <div class="kpi bad"><div class="v">Tuesday</div><div class="l">Worst Day (2.33%)</div></div></div>
+  <div class="row2">
+    <div class="card"><h3>Error Rate by Day</h3><canvas id="chart-dpd-days" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-dpd-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row2">
+    <div class="card"><h3>Top 3 Error Types — Weekly Trend</h3><canvas id="chart-dpd-error-trend" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-dpd-etypes" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+  </div>
+  <div class="row1">
+    <div class="card"><h3>Daily Breakdown</h3><div id="dpd-day-table"><table class="tbl"><thead><tr><th>Day</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Monday</td><td>1,591</td><td>19</td><td class="b">1.19%</td></tr><tr><td>Tuesday</td><td>1,545</td><td>36</td><td class="b">2.33%</td></tr><tr><td>Wednesday</td><td>967</td><td>19</td><td class="b">1.96%</td></tr><tr><td>Thursday</td><td>965</td><td>13</td><td class="b">1.35%</td></tr><tr><td>Friday</td><td>1,347</td><td>21</td><td class="b">1.56%</td></tr><tr><td>Saturday</td><td>491</td><td>4</td><td class="w">0.81%</td></tr><tr><td>Sunday</td><td>350</td><td>3</td><td class="w">0.86%</td></tr><tr><td>Total</td><td>7,256</td><td>115</td><td class="b">1.58%</td></tr></tbody></table></div></div>
+  </div>
+</div>
+
+
+
+</body></html>
