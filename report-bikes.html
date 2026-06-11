@@ -1,5 +1,35 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en"><head><script>(function(){
+  var H='efeb739691a202f2447f640960356d400724f4409145443dc77593900d057891',K='ff_auth_efeb739691a2';
+  if(sessionStorage.getItem(K)==='1')return;
+  function injectGate(){
+    if(!document.body)return;
+    var g=document.createElement('div');
+    g.id='ff-gate';
+    g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif;';
+    g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
+      +'<div style="font-size:32px;margin-bottom:8px">🌸</div>'
+      +'<h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin-bottom:4px">Freddie's Flowers</h2>'
+      +'<p style="color:#777;font-size:13px;margin-bottom:28px">Logistics KPI Report — enter password to access</p>'
+      +'<input id="ff-pw" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border .15s" onfocus="this.style.borderColor='#2d4a2d'" onblur="this.style.borderColor='#ddd'">'
+      +'<button id="ff-btn" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#3a6a3a'" onmouseout="this.style.background='#2d4a2d'">Access Report</button>'
+      +'<p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password — please try again</p>'
+      +'</div>';
+    document.body.prepend(g);
+    setTimeout(function(){var i=document.getElementById('ff-pw');if(i)i.focus();},100);
+    document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
+    document.getElementById('ff-btn').addEventListener('click',ffCheck);
+  }
+  async function ffCheck(){
+    var val=document.getElementById('ff-pw').value;
+    if(!val)return;
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
+    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+    if(hex===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
+    else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',injectGate);}else{injectGate();}
+})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Freddie's Flowers — FF Bikes Logistics Report</title>
@@ -222,6 +252,13 @@ const WEEK_DATA = {
       1.32,
       1.19
     ]
+  },
+  "passwords": {
+    "full": "freddies2025",
+    "ac": "abelandcole",
+    "gsg": "globalheston",
+    "bikes": "ffbikessw",
+    "dpd": "dpd2025"
   },
   "errorHistory": {
     "byType": {
@@ -6180,10 +6217,19 @@ window.addEventListener('DOMContentLoaded', renderDashboard);
 const COURIER_NAMES = { ac:'Abel & Cole', gsg:'GSG Global', bikes:'FF Bikes', dpd:'DPD' };
 const ALL_COURIERS  = ['ac','gsg','bikes','dpd'];
 
-function exportHTML(courierKey) {
+async function exportHTML(courierKey) {
   const status = document.getElementById('upload-status');
   try {
     const week = WEEK_DATA.week;
+    // Hash the password for this report
+    const pwMap = WEEK_DATA.passwords || {};
+    const plainPW = courierKey ? pwMap[courierKey] : pwMap.full;
+    let pwHash = null;
+    if (plainPW) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plainPW));
+      pwHash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
     const clone = document.documentElement.cloneNode(true);
 
     if (courierKey) {
@@ -6203,6 +6249,45 @@ function exportHTML(courierKey) {
       if (titleEl) titleEl.textContent = "Freddie's Flowers — " + COURIER_NAMES[courierKey] + " Logistics Report";
       const hdrP = clone.querySelector('.header-left p');
       if (hdrP) hdrP.innerHTML = 'Week <span id="hdr-week">' + (WEEK_DATA.week||'') + '</span> · Overview &amp; ' + COURIER_NAMES[courierKey];
+    }
+
+    // Inject password gate script if a password is set
+    if (pwHash) {
+      const sessionKey = 'ff_auth_' + pwHash.slice(0, 12);
+      const gateScript = clone.ownerDocument ? clone.ownerDocument.createElement('script') : document.createElement('script');
+      gateScript.textContent = `(function(){
+  var H='${pwHash}',K='${sessionKey}';
+  if(sessionStorage.getItem(K)==='1')return;
+  function injectGate(){
+    if(!document.body)return;
+    var g=document.createElement('div');
+    g.id='ff-gate';
+    g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif;';
+    g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
+      +'<div style="font-size:32px;margin-bottom:8px">🌸</div>'
+      +'<h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin-bottom:4px">Freddie\'s Flowers</h2>'
+      +'<p style="color:#777;font-size:13px;margin-bottom:28px">Logistics KPI Report — enter password to access</p>'
+      +'<input id="ff-pw" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border .15s" onfocus="this.style.borderColor=\'#2d4a2d\'" onblur="this.style.borderColor=\'#ddd\'">'
+      +'<button id="ff-btn" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s" onmouseover="this.style.background=\'#3a6a3a\'" onmouseout="this.style.background=\'#2d4a2d\'">Access Report</button>'
+      +'<p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password — please try again</p>'
+      +'</div>';
+    document.body.prepend(g);
+    setTimeout(function(){var i=document.getElementById('ff-pw');if(i)i.focus();},100);
+    document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
+    document.getElementById('ff-btn').addEventListener('click',ffCheck);
+  }
+  async function ffCheck(){
+    var val=document.getElementById('ff-pw').value;
+    if(!val)return;
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
+    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+    if(hex===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
+    else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',injectGate);}else{injectGate();}
+})();`;
+      const head = clone.querySelector('head');
+      if (head) head.insertBefore(gateScript, head.firstChild);
     }
 
     // Build export data — filter history to courier if courier-specific export
@@ -7098,7 +7183,7 @@ function handleCSVUpload(event){
 <div class="upload-bar">
   <button id="sheets-btn" class="export-btn" onclick="syncFromSheets()" style="background:#1a6b3a;" title="Pull latest data directly from the Google Sheet">🔄 Sync from Sheets</button>
   <label for="csv-upload">📂 Load CSV<input type="file" id="csv-upload" accept=".csv" onchange="handleCSVUpload(event)"></label>
-  <span id="upload-status" class="ok">✓ Downloaded WK23 — Full report</span>
+  <span id="upload-status" class="ok">✓ Downloaded WK23 — GSG Global</span>
   <div id="export-wrapper">
     <button class="export-btn" onclick="toggleExportMenu()">⬇ Export &amp; Share ▾</button>
     <div id="export-menu" style="display: block;">
@@ -7113,18 +7198,18 @@ function handleCSVUpload(event){
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showPage('overview',this)">Overview</div>
+  <div class="tab" onclick="showPage('overview',this)">Overview</div>
   
   
   <div class="tab" onclick="showPage('bikes',this)">FF Bikes</div>
   
   <div class="tab" onclick="showPage('errors',this)">🔍 Errors</div>
   <div class="tab" onclick="showPage('drivers',this)">👤 Drivers</div>
-  <div class="tab" onclick="showPage('gift',this)">🎁 Gift Failures</div>
+  <div class="tab active" onclick="showPage('gift',this)">🎁 Gift Failures</div>
 </div>
 
 <!-- ══ OVERVIEW ══ -->
-<div class="page active" id="page-overview" style="">
+<div class="page" id="page-overview" style="">
   <div id="overview-insight" class="insight warn">Error rate relatively stable at <strong>0.99% chargeable</strong> (-0.07pp vs last week). Saturday was the worst day at 3.33%; Friday the best at 0.71%. Top error type: <strong>Flowers not received - Photo shows wrong address</strong> (74 cases). <strong>Bikes</strong> was the best-performing courier at 0.32%; <strong>DPD</strong> the highest at 2.49%.</div>
   <div class="kpi-row">
     <div class="kpi" id="kpi-orders"><div class="v">26,800</div><div class="l">Total Orders</div></div>
@@ -7256,7 +7341,7 @@ function handleCSVUpload(event){
 
 
 <!-- ══ GIFT ══ -->
-<div class="page" id="page-gift" style="">
+<div class="page active" id="page-gift" style="">
   <div class="insight warn" style="margin-bottom:20px">
     <strong>Gift Delivery Failures</strong> — errors tagged as Gift in the error log, typically weekend and special occasion deliveries. Showing current week vs previous weeks.
   </div>
@@ -7267,12 +7352,12 @@ function handleCSVUpload(event){
     <div class="kpi bad"><div class="v">25%</div><div class="l">Gift Share of All Errors</div></div>
     <div class="kpi bad"><div class="v">DPD—78</div><div class="l">Highest Gift Errors</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Gift vs Core Errors — Weekly Trend</h3><canvas id="chart-gift-trend" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Gift Errors by Courier — This Week</h3><canvas id="chart-gift-courier" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Gift vs Core Errors — Weekly Trend</h3><canvas id="chart-gift-trend" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Gift Errors by Courier — This Week</h3><canvas id="chart-gift-courier" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
   </div>
   <div class="row2">
-    <div class="card"><h3>Gift Errors by Day — This Week</h3><canvas id="chart-gift-day" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Top Gift Error Types — This Week</h3><canvas id="chart-gift-types" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Gift Errors by Day — This Week</h3><canvas id="chart-gift-day" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Top Gift Error Types — This Week</h3><canvas id="chart-gift-types" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
   </div>
   <div class="row1">
     <div class="card scroll-wrap"><h3>Top Drivers / Riders — Gift Errors This Week</h3><div id="gift-driver-table"><table class="tbl"><thead><tr><th>Driver/Rider</th><th>Courier</th><th style="text-align:right">Gift Errors</th></tr></thead><tbody><tr><td>DPD</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">77</td></tr><tr><td>George Long FFBikes</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">1</td></tr><tr><td>(unknown)</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">1</td></tr><tr><td>Abel and Cole Sharpness</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">1</td></tr></tbody></table></div></div>
