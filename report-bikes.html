@@ -204,7 +204,7 @@ const WEEK_DATA = {
       0.25,
       0.51,
       0.81,
-      1.08,
+      0.9,
       0.9
     ],
     "gsgTotal": [
@@ -212,7 +212,7 @@ const WEEK_DATA = {
       0.37,
       0.76,
       1.08,
-      1.33,
+      1.13,
       1.01
     ],
     "dpdCharge": [
@@ -236,7 +236,7 @@ const WEEK_DATA = {
       0.69,
       0.8,
       0.82,
-      0.98,
+      0.94,
       0.92
     ],
     "allTotal": [
@@ -244,7 +244,7 @@ const WEEK_DATA = {
       0.88,
       1.04,
       1.04,
-      1.22,
+      1.17,
       1.1
     ]
   },
@@ -4519,7 +4519,7 @@ const WEEK_DATA = {
           3,
           13,
           8,
-          33,
+          32,
           30
         ]
       },
@@ -4530,7 +4530,7 @@ const WEEK_DATA = {
           2,
           2,
           7,
-          4,
+          0,
           6
         ]
       },
@@ -4541,7 +4541,7 @@ const WEEK_DATA = {
           2,
           1,
           15,
-          6,
+          7,
           6
         ]
       },
@@ -4563,7 +4563,7 @@ const WEEK_DATA = {
           5,
           4,
           3,
-          11,
+          6,
           4
         ]
       }
@@ -4789,7 +4789,7 @@ const WEEK_DATA = {
           0,
           0,
           1.57,
-          11.52,
+          12.04,
           12.04
         ]
       },
@@ -4800,7 +4800,7 @@ const WEEK_DATA = {
           0.14,
           0.14,
           1.65,
-          1.37,
+          0.82,
           0.82
         ]
       },
@@ -4823,7 +4823,7 @@ const WEEK_DATA = {
     "nonChargeableErrors": 52,
     "deliveredErrors": 90,
     "notDeliveredErrors": 225,
-    "prevWeekChargeable": 0.98,
+    "prevWeekChargeable": 0.94,
     "days": [
       {
         "name": "Monday",
@@ -5117,7 +5117,7 @@ const WEEK_DATA = {
     "nonChargeableErrors": 7,
     "deliveredErrors": 17,
     "notDeliveredErrors": 50,
-    "prevWeekChargeable": 1.08,
+    "prevWeekChargeable": 0.9,
     "dot": 95,
     "boxReturnRate": 22,
     "days": [
@@ -6060,11 +6060,6 @@ function renderDashboard(){
     targetDS(R.weeks,D.targets.ac,'Target'),
   ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
-  /* A&C depot trend */
-  const DT=D.depotTrends;
-  const depotColors=['#b5982a','#4a7c4a','#5b8fb9','#c0392b','#8e44ad','#16a085','#e67e22'];
-  mkChart('chart-ac-depot-trend',{type:'line',data:{labels:DT.weeks,datasets:DT.depots.map((dep,i)=>({label:dep.name,data:dep.data,borderColor:depotColors[i%depotColors.length],pointRadius:3,tension:.3,fill:false,spanGaps:true,borderWidth:dep.name==='Kent'?2.5:1.5}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}}}});
-
   /* A&C error type trend + split */
   errorTrendChart('chart-ac-error-trend', D.errorTrends.ac, D.errorTrends.weeks);
   mkChart('chart-ac-etypes',{type:'doughnut',data:{labels:top5(D.ac.errorTypes).map(e=>e.label),datasets:[{data:top5(D.ac.errorTypes).map(e=>e.count),backgroundColor:top5(D.ac.errorTypes).map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
@@ -6196,6 +6191,7 @@ function renderDashboard(){
   try { buildErrorsTab(); } catch(e) { console.warn('buildErrorsTab error:', e); }
   try { buildDriversTab(); } catch(e) { console.warn('buildDriversTab error:', e); }
   try { buildGiftTab(); } catch(e) { console.warn('buildGiftTab error:', e); }
+  try { buildWeeklyTab(); } catch(e) { console.warn('buildWeeklyTab error:', e); }
 
   // Restore pages — ALWAYS runs via try/finally so pages never stay hidden
   allPages.forEach(p => { p.style.display = ''; p.style.visibility = ''; p.style.position = ''; });
@@ -6352,6 +6348,174 @@ async function syncFromSheets() {
     if (status) { status.textContent = '✕ ' + err.message; status.className = 'err'; }
   }
   if (btn) { btn.textContent = '🔄 Sync from Sheets'; btn.disabled = false; }
+}
+
+/* ═══════════════════ WEEKLY BROWSER TAB ═══════════════════ */
+
+function buildWeeklyTab() {
+  const D = WEEK_DATA;
+  const eh = D.errorHistory || {byType:{},weeks:[],currentWeek:''};
+  const weeks = eh.weeks || [];
+  const currentWeek = eh.currentWeek || '';
+
+  const container = el('week-pills-container');
+  if (!container) return;
+
+  if (!weeks.length) {
+    container.innerHTML = '<p style="color:#999;font-size:13px">Upload a CSV to browse errors by week.</p>';
+    return;
+  }
+
+  // Build week pills — most recent first, current week highlighted
+  container.innerHTML = weeks.slice().reverse().map(wl => {
+    const isCurrent = wl === currentWeek;
+    const allRecs = Object.values(eh.byType).flat().filter(e => 'WK'+e.week === wl);
+    return `<div class="error-pill ${isCurrent?'active':''}" onclick="showWeekDetail('${wl}')" id="wpill-${wl}" style="${isCurrent?'--color:#2d4a2d':''}">
+      <span class="pill-count" style="color:${isCurrent?'#f0c040':'#2d4a2d'}">${allRecs.length}</span>
+      <span>${wl}${isCurrent?' (current)':''}</span>
+    </div>`;
+  }).join('');
+
+  // Auto-select current week
+  if (currentWeek) showWeekDetail(currentWeek);
+}
+
+function showWeekDetail(weekLabel) {
+  const D = WEEK_DATA;
+  const eh = D.errorHistory || {byType:{},weeks:[],currentWeek:''};
+  const weeks = eh.weeks || [];
+
+  // Highlight selected pill
+  document.querySelectorAll('#week-pills-container .error-pill').forEach(p => p.classList.remove('active'));
+  const pill = el('wpill-' + weekLabel);
+  if (pill) pill.classList.add('active');
+  el('weekly-detail').style.display = 'block';
+
+  const allRecs = Object.values(eh.byType).flat().filter(e => 'WK'+e.week === weekLabel);
+  const wkIndex = weeks.indexOf(weekLabel);
+  const prevWeekLabel = wkIndex > 0 ? weeks[wkIndex-1] : null;
+  const prevRecs = prevWeekLabel ? Object.values(eh.byType).flat().filter(e => 'WK'+e.week === prevWeekLabel) : [];
+  const giftRecs = allRecs.filter(e => e.giftCore === 'Gift');
+  const coreRecs = allRecs.filter(e => e.giftCore === 'Core');
+
+  ['chart-weekly-courier','chart-weekly-types','chart-weekly-day','chart-weekly-gift'].forEach(id => {
+    const c = Chart.getChart(el(id)); if(c) c.destroy();
+  });
+
+  const courierNames = {ac:'A&C', gsg:'GSG', bikes:'Bikes', dpd:'DPD'};
+  const courierColors = {ac:'#b5982a', gsg:'#5b8fb9', bikes:'#4a7c4a', dpd:'#c0392b'};
+  const shortLabel = l => l.replace('Flowers not received - ','').replace('Instructions not followed - ','').replace('Driver Notified No Flowers - ','').replace('Driver Notified - ','');
+
+  // Compute rates using rolling data (delivery numbers per courier)
+  const rollingWks = D.rolling?.weeks || [];
+  const rollingIdx = rollingWks.indexOf(weekLabel);
+  function getRollingRate(key) {
+    if (rollingIdx < 0 || !D.rolling?.[key]) return null;
+    return D.rolling[key][rollingIdx];
+  }
+  const chargeRate = getRollingRate('allCharge');
+  const totalRate  = getRollingRate('allTotal');
+  const prevChargeRate = prevWeekLabel ? D.rolling?.allCharge?.[rollingIdx-1] : null;
+
+  // Courier breakdown
+  const courierCounts = {ac:0, gsg:0, bikes:0, dpd:0};
+  allRecs.forEach(e => { if(courierCounts[e.courierKey]!==undefined) courierCounts[e.courierKey]++; });
+  const topCourier = Object.entries(courierCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  // Error types
+  const typeMap = {};
+  allRecs.forEach(e => { const t=e.errorType||'Other'; typeMap[t]=(typeMap[t]||0)+1; });
+  const topType = Object.entries(typeMap).sort((a,b)=>b[1]-a[1])[0];
+
+  // Days
+  const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayCounts=DAYS.map(d=>allRecs.filter(e=>e.dayName===d).length);
+  const worstDay=DAYS[dayCounts.indexOf(Math.max(...dayCounts))];
+  const bestDay=DAYS[dayCounts.indexOf(Math.min(...dayCounts.filter(v=>v>0)))];
+
+  // WoW
+  const wowCount = allRecs.length - prevRecs.length;
+  const wowStr = prevRecs.length ? (wowCount>0?`▲ ${wowCount} vs ${prevWeekLabel}`:`▼ ${Math.abs(wowCount)} vs ${prevWeekLabel}`) : '';
+  const wowClass = wowCount>0?'bad-t':wowCount<0?'good':'';
+
+  // KPIs
+  const rateKpi = chargeRate!=null
+    ? `<div class="kpi ${chargeRate>1?'bad':chargeRate>0.5?'warn':''}"><div class="v">${chargeRate.toFixed(2)}%</div><div class="l">Chargeable Rate</div></div>
+       <div class="kpi"><div class="v">${totalRate!=null?totalRate.toFixed(2)+'%':'—'}</div><div class="l">Total Error Rate</div></div>`
+    : '';
+  el('weekly-kpis').innerHTML = `
+    <div class="kpi"><div class="v">${allRecs.length}</div>${wowStr?`<span class="delta ${wowClass}" style="font-size:11px;font-weight:600">${wowStr}</span>`:''}<div class="l">Total Errors</div></div>
+    ${rateKpi}
+    <div class="kpi warn"><div class="v">${giftRecs.length}</div><div class="l">Gift Errors</div></div>
+    <div class="kpi bad"><div class="v">${topCourier?courierNames[topCourier[0]]:'—'}</div><div class="l">Most Errors (${topCourier?topCourier[1]:0})</div></div>`;
+
+  // ── Auto-generated analysis ──
+  const chargeWow = (chargeRate!=null&&prevChargeRate!=null) ? chargeRate-prevChargeRate : null;
+  let analysis = '';
+  // Opening line — overall direction
+  if (chargeWow!=null) {
+    if (chargeWow <= -0.05) analysis += `<strong>Improvement vs ${prevWeekLabel}</strong> — chargeable rate fell ${Math.abs(chargeWow).toFixed(2)}pp to ${chargeRate.toFixed(2)}%. `;
+    else if (chargeWow >= 0.10) analysis += `<strong>⚠️ Error rate up ${chargeWow.toFixed(2)}pp</strong> vs ${prevWeekLabel} to ${chargeRate.toFixed(2)}% chargeable. `;
+    else analysis += `Error rate relatively stable at <strong>${chargeRate!=null?chargeRate.toFixed(2)+'% chargeable':allRecs.length+' total errors'}</strong>. `;
+  } else {
+    analysis += `<strong>${weekLabel}</strong> recorded ${allRecs.length} total errors. `;
+  }
+  // Courier callout
+  if (topCourier && topCourier[1]>0) {
+    const secondCourier = Object.entries(courierCounts).sort((a,b)=>b[1]-a[1])[1];
+    analysis += `<strong>${courierNames[topCourier[0]]}</strong> had the most errors (${topCourier[1]})`;
+    if (secondCourier && secondCourier[1]>0) analysis += `, followed by ${courierNames[secondCourier[0]]} (${secondCourier[1]})`;
+    analysis += '. ';
+  }
+  // Day callout
+  if (worstDay && Math.max(...dayCounts)>0) analysis += `${worstDay} was the worst day`;
+  if (bestDay && bestDay!==worstDay) analysis += `; ${bestDay} the best`;
+  if (worstDay) analysis += '. ';
+  // Top error type
+  if (topType) analysis += `Top error: <strong>${shortLabel(topType[0])}</strong> (${topType[1]} cases). `;
+  // Gift/Core
+  if (giftRecs.length>0) {
+    const giftPct = Math.round(giftRecs.length/allRecs.length*100);
+    analysis += `Gift errors accounted for ${giftPct}% of all errors this week.`;
+  }
+  const tone = (chargeWow!=null&&chargeWow>=0.10)||(!chargeWow&&allRecs.length>200) ? 'warn' : 'good';
+  el('weekly-analysis').className = `insight ${tone}`;
+  el('weekly-analysis').innerHTML = analysis || 'Select a week to see analysis.';
+
+  // Charts
+  mkChart('chart-weekly-courier',{type:'bar',data:{
+    labels:['A&C','GSG','Bikes','DPD'],
+    datasets:[{label:'Errors',data:[courierCounts.ac,courierCounts.gsg,courierCounts.bikes,courierCounts.dpd],
+      backgroundColor:['#b5982a','#5b8fb9','#4a7c4a','#c0392b']}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:11}},beginAtZero:true}}}});
+
+  const topTypes = Object.entries(typeMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  mkChart('chart-weekly-types',{type:'bar',data:{
+    labels:topTypes.map(([l])=>shortLabel(l)),
+    datasets:[{label:'Count',data:topTypes.map(([,v])=>v),backgroundColor:DONUT_COLORS}]
+  },options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  mkChart('chart-weekly-day',{type:'bar',data:{
+    labels:DAYS.map(d=>d.slice(0,3)),
+    datasets:[{label:'Errors',data:dayCounts,backgroundColor:dayCounts.map((v,i)=>i>=5?'#e67e22':v===Math.max(...dayCounts)&&v>0?'#c0392b':'#4a7c4a')}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:11}},beginAtZero:true}}}});
+
+  mkChart('chart-weekly-gift',{type:'doughnut',data:{
+    labels:[`Gift (${giftRecs.length})`,`Core (${coreRecs.length})`],
+    datasets:[{data:[giftRecs.length,coreRecs.length],backgroundColor:['#e67e22','#4a7c4a']}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+
+  // Top drivers table
+  const drvMap={};
+  allRecs.forEach(e=>{const d=e.driver||'(unknown)';if(!drvMap[d])drvMap[d]={count:0,courier:e.courierKey};drvMap[d].count++;});
+  const topDrivers=Object.entries(drvMap).sort((a,b)=>b[1].count-a[1].count).slice(0,10);
+  el('weekly-driver-table').innerHTML=topDrivers.length
+    ?`<table class="tbl"><thead><tr><th>Driver</th><th>Courier</th><th style="text-align:right">Errors</th></tr></thead><tbody>${
+      topDrivers.map(([n,{count,courier}])=>`<tr><td>${n}</td><td style="color:#666;font-size:11px">${courierNames[courier]||courier}</td><td style="text-align:right;font-weight:700">${count}</td></tr>`).join('')
+    }</tbody></table>`
+    :'<p style="color:#999;padding:8px;font-size:12px">No data</p>';
+
+  el('weekly-detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 /* ═══════════════════ GIFT FAILURES TAB ═══════════════════ */
@@ -7193,23 +7357,24 @@ function handleCSVUpload(event){
 </div>
 
 <div class="tabs">
-  <div class="tab" onclick="showPage('overview',this)">Overview</div>
+  <div class="tab active" onclick="showPage('overview',this)">Overview</div>
   
   
-  <div class="tab active" onclick="showPage('bikes',this)">FF Bikes</div>
+  <div class="tab" onclick="showPage('bikes',this)">FF Bikes</div>
   
   <div class="tab" onclick="showPage('errors',this)">🔍 Errors</div>
   <div class="tab" onclick="showPage('drivers',this)">👤 Drivers</div>
   <div class="tab" onclick="showPage('gift',this)">🎁 Gift Failures</div>
+  <div class="tab" onclick="showPage('weekly',this)">📅 Browse by Week</div>
 </div>
 
 <!-- ══ OVERVIEW ══ -->
-<div class="page" id="page-overview" style="">
-  <div id="overview-insight" class="insight warn">Error rate relatively stable at <strong>0.92% chargeable</strong> (-0.06pp vs last week). Sunday was the worst day at 2.57%; Friday the best at 0.69%. Top error type: <strong>Flowers not received - Photo shows wrong address</strong> (69 cases). <strong>Bikes</strong> was the best-performing courier at 0.34%; <strong>DPD</strong> the highest at 1.77%.</div>
+<div class="page active" id="page-overview" style="">
+  <div id="overview-insight" class="insight warn">Error rate relatively stable at <strong>0.92% chargeable</strong> (-0.02pp vs last week). Sunday was the worst day at 2.57%; Friday the best at 0.69%. Top error type: <strong>Flowers not received - Photo shows wrong address</strong> (69 cases). <strong>Bikes</strong> was the best-performing courier at 0.34%; <strong>DPD</strong> the highest at 1.77%.</div>
   <div class="kpi-row">
     <div class="kpi" id="kpi-orders"><div class="v">28,582</div><div class="l">Total Orders</div></div>
     <div class="kpi" id="kpi-total-err"><div class="v">315</div><div class="l">Total Errors</div></div>
-    <div class="kpi warn" id="kpi-charge"><div class="v">0.92%</div><span class="delta down">▼ 0.06pp vs WK22</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi warn" id="kpi-charge"><div class="v">0.92%</div><span class="delta flat">≈ flat vs last week</span><div class="l">Chargeable Rate</div></div>
     <div class="kpi" id="kpi-notdel"><div class="v">225</div><div class="l">Not Delivered</div></div>
     <div class="kpi warn" id="kpi-delivered"><div class="v">90</div><div class="l">Delivered Errors</div></div>
     <div class="kpi bad" id="kpi-worst-day"><div class="v">Sunday</div><div class="l">Worst Day (2.57%)</div></div>
@@ -7291,7 +7456,7 @@ function handleCSVUpload(event){
 
 
 <!-- ══ BIKES ══ -->
-<div class="page active" id="page-bikes" style="">
+<div class="page" id="page-bikes" style="">
   <div id="bikes-insight" class="insight good"><strong>Improvement this week</strong> — chargeable rate down 0.11pp to 0.34%. Wednesday was the worst day at 1.01%; Tuesday the best at 0.49%. Top error type: <strong>Flowers not received - Stolen</strong> (11 cases). DOT: 96%. Box return rate: 24%. Stolen most common error type due to inner city drops</div>
   <div class="kpi-row" id="bikes-kpis">
     <div class="kpi"><div class="v">5,555</div><div class="l">Total Orders</div></div>
@@ -7335,6 +7500,55 @@ function handleCSVUpload(event){
 <!-- ══ DPD ══ -->
 
 
+<!-- ══ WEEKLY ══ -->
+<div class="page" id="page-weekly" style="">
+  <div class="insight good" style="margin-bottom:20px">
+    <strong>Browse by Week</strong> — select any week to see a full breakdown of errors, courier performance, error types, and top drivers for that period.
+  </div>
+  <div class="card row1" style="margin-bottom:20px">
+    <h3>Select Week</h3>
+    <div id="week-pills-container" style="display:flex;flex-wrap:wrap;gap:10px;padding:4px 0"><div class="error-pill active" onclick="showWeekDetail('WK23')" id="wpill-WK23" style="--color:#2d4a2d">
+      <span class="pill-count" style="color:#f0c040">315</span>
+      <span>WK23 (current)</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK22')" id="wpill-WK22" style="">
+      <span class="pill-count" style="color:#2d4a2d">306</span>
+      <span>WK22</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK21')" id="wpill-WK21" style="">
+      <span class="pill-count" style="color:#2d4a2d">277</span>
+      <span>WK21</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK20')" id="wpill-WK20" style="">
+      <span class="pill-count" style="color:#2d4a2d">257</span>
+      <span>WK20</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK19')" id="wpill-WK19" style="">
+      <span class="pill-count" style="color:#2d4a2d">229</span>
+      <span>WK19</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK18')" id="wpill-WK18" style="">
+      <span class="pill-count" style="color:#2d4a2d">282</span>
+      <span>WK18</span>
+    </div></div>
+  </div>
+  <div id="weekly-detail" style="display: block;">
+    <div id="weekly-analysis" class="insight good" style="margin-bottom:16px">Error rate relatively stable at <strong>0.92% chargeable</strong>. <strong>DPD</strong> had the most errors (158), followed by GSG (67). Monday was the worst day; Sunday the best. Top error: <strong>Photo shows wrong address</strong> (69 cases). Gift errors accounted for 25% of all errors this week.</div>
+    <div class="kpi-row" id="weekly-kpis">
+    <div class="kpi"><div class="v">315</div><span class="delta bad-t" style="font-size:11px;font-weight:600">▲ 9 vs WK22</span><div class="l">Total Errors</div></div>
+    <div class="kpi warn"><div class="v">0.92%</div><div class="l">Chargeable Rate</div></div>
+       <div class="kpi"><div class="v">1.10%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi warn"><div class="v">80</div><div class="l">Gift Errors</div></div>
+    <div class="kpi bad"><div class="v">DPD</div><div class="l">Most Errors (158)</div></div></div>
+    <div class="row2">
+      <div class="card"><h3>Errors by Courier</h3><canvas id="chart-weekly-courier" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Top Error Types</h3><canvas id="chart-weekly-types" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    </div>
+    <div class="row2">
+      <div class="card"><h3>Errors by Day</h3><canvas id="chart-weekly-day" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Gift vs Core Split</h3><canvas id="chart-weekly-gift" height="1286" style="box-sizing: border-box; display: block; height: 643px; width: 643px;" width="1286"></canvas></div>
+    </div>
+    <div class="row1">
+      <div class="card scroll-wrap"><h3>Top Drivers / Riders</h3><div id="weekly-driver-table"><table class="tbl"><thead><tr><th>Driver</th><th>Courier</th><th style="text-align:right">Errors</th></tr></thead><tbody><tr><td>DPD</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">157</td></tr><tr><td>(unknown)</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">27</td></tr><tr><td>IONUTHARRY Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">23</td></tr><tr><td>Abel and Cole Cambridge</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">11</td></tr><tr><td>Abel and Cole Sharpness</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">8</td></tr><tr><td>Abel and Cole Andover</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">7</td></tr><tr><td>Abel and Cole Doncaster</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">7</td></tr><tr><td>Stanislavs Senko Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">7</td></tr><tr><td>DannyGSG Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>Abel and Cole Kent</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">5</td></tr></tbody></table></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ GIFT ══ -->
 <div class="page" id="page-gift" style="">
   <div class="insight warn" style="margin-bottom:20px">
@@ -7342,7 +7556,7 @@ function handleCSVUpload(event){
   </div>
   <div class="kpi-row" id="gift-kpis">
     <div class="kpi bad">
-      <div class="v">80</div> <span style="font-size:11px;font-weight:700;color:#c0392b">▲8 vs last week</span><div class="l">Gift Errors This Week</div></div>
+      <div class="v">80</div> <span style="font-size:11px;font-weight:700;color:#c0392b">▲9 vs last week</span><div class="l">Gift Errors This Week</div></div>
     <div class="kpi"><div class="v">235</div><div class="l">Core Errors</div></div>
     <div class="kpi bad"><div class="v">25%</div><div class="l">Gift Share of All Errors</div></div>
     <div class="kpi bad"><div class="v">DPD—78</div><div class="l">Highest Gift Errors</div></div></div>
@@ -7369,7 +7583,7 @@ function handleCSVUpload(event){
     <div id="driver-pills-container"><div class="error-section-label" style="color:#b5982a">Abel &amp; Cole</div><div class="error-pills"><div class="error-pill" onclick="showDriverDetail('(unknown)','ac')" id="dpill-\(unknown\)">
         <span class="pill-count" style="color:#b5982a">27</span>
         <span>(unknown)</span>
-        <span class="pill-wow down">▼13</span>
+        <span class="pill-wow down">▼2</span>
       </div><div class="error-pill" onclick="showDriverDetail('Abel and Cole Cambridge','ac')" id="dpill-Abel\ and\ Cole\ Cambridge">
         <span class="pill-count" style="color:#b5982a">11</span>
         <span>Abel and Cole Cambridge</span>
@@ -7401,19 +7615,19 @@ function handleCSVUpload(event){
       </div></div><div class="error-section-label" style="color:#5b8fb9">Global Heston</div><div class="error-pills"><div class="error-pill" onclick="showDriverDetail('IONUTHARRY Global','gsg')" id="dpill-IONUTHARRY\ Global">
         <span class="pill-count" style="color:#5b8fb9">23</span>
         <span>IONUTHARRY</span>
-        <span class="pill-wow up">▲1</span>
+        
       </div><div class="error-pill" onclick="showDriverDetail('Stanislavs Senko Global','gsg')" id="dpill-Stanislavs\ Senko\ Global">
         <span class="pill-count" style="color:#5b8fb9">7</span>
         <span>Stanislavs Senko</span>
-        <span class="pill-wow down">▼6</span>
+        <span class="pill-wow down">▼2</span>
       </div><div class="error-pill" onclick="showDriverDetail('DannyGSG Global','gsg')" id="dpill-DannyGSG\ Global">
         <span class="pill-count" style="color:#5b8fb9">6</span>
         <span>Danny</span>
-        <span class="pill-wow down">▼1</span>
+        
       </div><div class="error-pill" onclick="showDriverDetail('Ken Ogiste Global','gsg')" id="dpill-Ken\ Ogiste\ Global">
         <span class="pill-count" style="color:#5b8fb9">4</span>
         <span>Ken Ogiste</span>
-        <span class="pill-wow down">▼4</span>
+        <span class="pill-wow down">▼5</span>
       </div><div class="error-pill" onclick="showDriverDetail('NicholasGSG','gsg')" id="dpill-NicholasGSG">
         <span class="pill-count" style="color:#5b8fb9">4</span>
         <span>Nicholas</span>
@@ -7421,22 +7635,22 @@ function handleCSVUpload(event){
       </div><div class="error-pill" onclick="showDriverDetail('Cosmin Colesnc Global','gsg')" id="dpill-Cosmin\ Colesnc\ Global">
         <span class="pill-count" style="color:#5b8fb9">3</span>
         <span>Cosmin Colesnc</span>
-        <span class="pill-wow up">▲1</span>
+        
       </div><div class="error-pill" onclick="showDriverDetail('Sanjay Global','gsg')" id="dpill-Sanjay\ Global">
         <span class="pill-count" style="color:#5b8fb9">3</span>
         <span>Sanjay</span>
-        <span class="pill-wow up">▲1</span>
+        <span class="pill-wow down">▼1</span>
       </div><div class="error-pill" onclick="showDriverDetail('Kasia B','gsg')" id="dpill-Kasia\ B">
         <span class="pill-count" style="color:#5b8fb9">3</span>
         <span>Kasia B</span>
         <span class="pill-wow up">▲3</span>
-      </div><div class="error-pill" onclick="showDriverDetail('Lesley Morgan Global','gsg')" id="dpill-Lesley\ Morgan\ Global">
-        <span class="pill-count" style="color:#5b8fb9">2</span>
-        <span>Lesley Morgan</span>
-        <span class="pill-wow up">▲1</span>
       </div><div class="error-pill" onclick="showDriverDetail('Katarzyna Bakaj Global','gsg')" id="dpill-Katarzyna\ Bakaj\ Global">
         <span class="pill-count" style="color:#5b8fb9">2</span>
         <span>Katarzyna Bakaj</span>
+        <span class="pill-wow up">▲1</span>
+      </div><div class="error-pill" onclick="showDriverDetail('Lesley Morgan Global','gsg')" id="dpill-Lesley\ Morgan\ Global">
+        <span class="pill-count" style="color:#5b8fb9">2</span>
+        <span>Lesley Morgan</span>
         <span class="pill-wow up">▲1</span>
       </div><div class="error-pill" onclick="showDriverDetail('Shazad Shahid Global','gsg')" id="dpill-Shazad\ Shahid\ Global">
         <span class="pill-count" style="color:#5b8fb9">2</span>
@@ -7454,21 +7668,17 @@ function handleCSVUpload(event){
         <span class="pill-count" style="color:#5b8fb9">0</span>
         <span>Daniel Mlot</span>
         <span class="pill-wow down">▼3</span>
-      </div><div class="error-pill" onclick="showDriverDetail('Peter Slade Global','gsg')" id="dpill-Peter\ Slade\ Global">
-        <span class="pill-count" style="color:#5b8fb9">0</span>
-        <span>Peter Slade</span>
-        <span class="pill-wow down">▼1</span>
-      </div><div class="error-pill" onclick="showDriverDetail('Julie Rand Global','gsg')" id="dpill-Julie\ Rand\ Global">
-        <span class="pill-count" style="color:#5b8fb9">0</span>
-        <span>Julie Rand</span>
-        <span class="pill-wow down">▼2</span>
       </div><div class="error-pill" onclick="showDriverDetail('Razvan Mihalache Global','gsg')" id="dpill-Razvan\ Mihalache\ Global">
         <span class="pill-count" style="color:#5b8fb9">0</span>
         <span>Razvan Mihalache</span>
         <span class="pill-wow down">▼2</span>
-      </div><div class="error-pill" onclick="showDriverDetail('Imbrurazwan Global','gsg')" id="dpill-Imbrurazwan\ Global">
+      </div><div class="error-pill" onclick="showDriverDetail('Julie Rand Global','gsg')" id="dpill-Julie\ Rand\ Global">
         <span class="pill-count" style="color:#5b8fb9">0</span>
-        <span>Imbrurazwan</span>
+        <span>Julie Rand</span>
+        <span class="pill-wow down">▼2</span>
+      </div><div class="error-pill" onclick="showDriverDetail('Peter Slade','gsg')" id="dpill-Peter\ Slade">
+        <span class="pill-count" style="color:#5b8fb9">0</span>
+        <span>Peter Slade</span>
         <span class="pill-wow down">▼1</span>
       </div></div><div class="error-section-label" style="color:#4a7c4a">FF Bikes SW</div><div class="error-pills"><div class="error-pill" onclick="showDriverDetail('George Long FFBikes','bikes')" id="dpill-George\ Long\ FFBikes">
         <span class="pill-count" style="color:#4a7c4a">5</span>
@@ -7541,20 +7751,24 @@ function handleCSVUpload(event){
       </div></div><div class="error-section-label" style="color:#c0392b">DPD</div><div class="error-pills"><div class="error-pill" onclick="showDriverDetail('DPD','dpd')" id="dpill-DPD">
         <span class="pill-count" style="color:#c0392b">157</span>
         <span>DPD</span>
-        <span class="pill-wow up">▲5</span>
+        <span class="pill-wow up">▲6</span>
       </div></div></div>
   </div>
-  <div id="driver-detail" style="display:none">
+  <div id="driver-detail" style="display: none;">
     <div class="card row1" style="margin-bottom:16px;background:#f0f7f0;border-left:4px solid var(--green-mid)">
-      <h3 id="driver-detail-title" style="font-size:14px;font-weight:700;color:var(--green-dark);text-transform:none;letter-spacing:0"></h3>
+      <h3 id="driver-detail-title" style="font-size:14px;font-weight:700;color:var(--green-dark);text-transform:none;letter-spacing:0">(unknown)</h3>
     </div>
-    <div class="kpi-row" id="driver-stats"></div>
+    <div class="kpi-row" id="driver-stats">
+    <div class="kpi"><div class="v">27</div><div class="l">Errors This Week</div></div>
+    <div class="kpi bad"><div class="v">28.2</div><div class="l">Weekly Average</div></div>
+    <div class="kpi"><div class="v">Stolen…</div><div class="l">Top Error Type</div></div>
+  </div>
     <div class="row2">
-      <div class="card"><h3>Weekly Error Count</h3><canvas id="chart-driver-weekly" height="200"></canvas></div>
-      <div class="card"><h3>Error Types — This Week</h3><canvas id="chart-driver-types" height="200"></canvas></div>
+      <div class="card"><h3>Weekly Error Count</h3><canvas id="chart-driver-weekly" height="200" style="box-sizing: border-box;" width="300"></canvas></div>
+      <div class="card"><h3>Error Types — This Week</h3><canvas id="chart-driver-types" height="200" style="box-sizing: border-box;" width="300"></canvas></div>
     </div>
     <div class="row1">
-      <div class="card"><h3>Day of Week — This Week</h3><canvas id="chart-driver-day" height="180"></canvas></div>
+      <div class="card"><h3>Day of Week — This Week</h3><canvas id="chart-driver-day" height="180" style="box-sizing: border-box;" width="300"></canvas></div>
     </div>
   </div>
 </div>
@@ -7574,7 +7788,7 @@ function handleCSVUpload(event){
       </div><div class="error-pill" onclick="showErrorDetail('Driver Notified No Flowers - Box Not on Van')" id="pill-Driver\ Notified\ No\ Flowers\ -\ Box\ Not\ on\ Van">
         <span class="pill-count">14</span>
         <span>Box Not on Van</span>
-        <span class="pill-wow up">▲1</span>
+        
       </div><div class="error-pill" onclick="showErrorDetail('Driver Notified No Flowers - Out of Time')" id="pill-Driver\ Notified\ No\ Flowers\ -\ Out\ of\ Time">
         <span class="pill-count">12</span>
         <span>Out of Time</span>
@@ -7594,19 +7808,19 @@ function handleCSVUpload(event){
       </div></div><div class="error-section-label">Flowers Not Received</div><div class="error-pills"><div class="error-pill" onclick="showErrorDetail('Flowers not received - Photo shows wrong address')" id="pill-Flowers\ not\ received\ -\ Photo\ shows\ wrong\ address">
         <span class="pill-count">69</span>
         <span>Photo shows wrong address</span>
-        <span class="pill-wow up">▲8</span>
+        <span class="pill-wow up">▲9</span>
       </div><div class="error-pill" onclick="showErrorDetail('Flowers not received - Parcel held (DPD)')" id="pill-Flowers\ not\ received\ -\ Parcel\ held\ \(DPD\)">
         <span class="pill-count">46</span>
         <span>Parcel held (DPD)</span>
-        <span class="pill-wow up">▲4</span>
+        <span class="pill-wow up">▲5</span>
       </div><div class="error-pill" onclick="showErrorDetail('Flowers not received - Stolen')" id="pill-Flowers\ not\ received\ -\ Stolen">
         <span class="pill-count">17</span>
         <span>Stolen</span>
-        <span class="pill-wow down">▼20</span><span class="pill-nc">NC</span>
+        <span class="pill-wow down">▼18</span><span class="pill-nc">NC</span>
       </div><div class="error-pill" onclick="showErrorDetail('Flowers not received - Box Damaged')" id="pill-Flowers\ not\ received\ -\ Box\ Damaged">
         <span class="pill-count">13</span>
         <span>Box Damaged</span>
-        <span class="pill-wow up">▲4</span>
+        <span class="pill-wow up">▲5</span>
       </div><div class="error-pill" onclick="showErrorDetail('Flowers not received - Photo shows delivery instruction not followed')" id="pill-Flowers\ not\ received\ -\ Photo\ shows\ delivery\ instruction\ not\ followed">
         <span class="pill-count">10</span>
         <span>Photo shows delivery instruction not followed</span>
@@ -7626,7 +7840,7 @@ function handleCSVUpload(event){
       </div></div><div class="error-section-label">Instructions Not Followed</div><div class="error-pills"><div class="error-pill" onclick="showErrorDetail('Instructions not followed - Box left in wrong place')" id="pill-Instructions\ not\ followed\ -\ Box\ left\ in\ wrong\ place">
         <span class="pill-count">22</span>
         <span>Box left in wrong place</span>
-        <span class="pill-wow down">▼5</span>
+        
       </div><div class="error-pill" onclick="showErrorDetail('Instructions not followed - Box damaged in transit')" id="pill-Instructions\ not\ followed\ -\ Box\ damaged\ in\ transit">
         <span class="pill-count">21</span>
         <span>Box damaged in transit</span>
@@ -7638,7 +7852,7 @@ function handleCSVUpload(event){
       </div><div class="error-pill" onclick="showErrorDetail('Instructions not followed - Old box not collected')" id="pill-Instructions\ not\ followed\ -\ Old\ box\ not\ collected">
         <span class="pill-count">9</span>
         <span>Old box not collected</span>
-        
+        <span class="pill-wow up">▲4</span>
       </div><div class="error-pill" onclick="showErrorDetail('Instructions not followed - Received wrong box')" id="pill-Instructions\ not\ followed\ -\ Received\ wrong\ box">
         <span class="pill-count">7</span>
         <span>Received wrong box</span>
