@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<!-- saved from url=(0247)file:///Users/joecoulson/Library/Application%20Support/Claude/local-agent-mode-sessions/c9c7fc00-e3b8-49b7-a4fb-eb74505a0d7a/5cc40eac-33bc-48a1-8b61-272c7bca71e2/local_d0d189dd-4ef0-4183-bb0a-14c17ca56cca/outputs/freddies-flowers-delivery-map.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freddie's Flowers — Undeliverable Postcodes</title>
+  <link rel="stylesheet" href="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/leaflet.min.css">
+  <script src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/leaflet.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f0; }
+
+    header {
+      background: #2d5a27;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    header h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.3px; }
+    header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+
+    #map { height: calc(100vh - 65px); width: 100%; }
+
+    .legend {
+      background: white;
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      font-size: 13px;
+      min-width: 200px;
+    }
+    .legend h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.5px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: #555; }
+    .legend-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    }
+    .legend-line { height: 2px; width: 14px; flex-shrink: 0; }
+
+    .info-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      font-size: 13px;
+      max-width: 220px;
+      margin-top: 8px;
+    }
+    .info-panel h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #c0392b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-panel .stat { display: flex; justify-content: space-between; margin-bottom: 5px; color: #555; }
+    .info-panel .stat span:last-child { font-weight: 600; color: #333; }
+
+    .popup-title { font-weight: 700; font-size: 14px; color: #c0392b; margin-bottom: 4px; }
+    .popup-desc { font-size: 12px; color: #555; line-height: 1.5; }
+    .popup-codes { font-size: 11px; color: #777; margin-top: 6px; font-family: monospace; }
+  </style>
+</head>
+<body class="">
+
+<header>
+  <div>
+    <h1>Freddie's Flowers — UK Delivery Coverage</h1>
+    <p>Red zones indicate areas we do not currently deliver to</p>
+  </div>
+</header>
+
+<div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative; outline-style: none;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(-21px, -182px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 19; transform: translate3d(-739px, -564px, 0px) scale(1);"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1354px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1354px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1098px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1610px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1354px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1098px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1610px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1098px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1610px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1354px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(1).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1098px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(2).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1610px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(842px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(4).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1866px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(842px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(4).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1866px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(842px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(4).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1866px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(3).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(842px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(4).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1866px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(5).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(586px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/9@2x(6).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(2122px, 774px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(5).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(586px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/10@2x(6).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(2122px, 1030px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(5).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(586px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/8@2x(6).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(2122px, 518px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(5).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(586px, 1286px, 0px); opacity: 1;"><img alt="" src="./Freddie&#39;s Flowers — Undeliverable Postcodes_files/11@2x(6).png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(2122px, 1286px, 0px); opacity: 1;"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(26px, -23px, 0px) scale(0.5);"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="1728" height="868" viewBox="-123 110 1728 868" style="transform: translate3d(-123px, 110px, 0px);"><g><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M737.1511111111113,395.5175256005332a36,36 0 1,0 72,0 a36,36 0 1,0 -72,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M762.3555555555554,349.2630807665264a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M788.1111111111113,411.29493903088587a26,26 0 1,0 52,0 a26,26 0 1,0 -52,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M745.9777777777776,423.67332128260523a34,34 0 1,0 68,0 a34,34 0 1,0 -68,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M719.1199999999999,448.4981759502848a29,29 0 1,0 58,0 a29,29 0 1,0 -58,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M757.8755555555554,433.0983977846463a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M691.2622222222221,379.57263418431467a25,25 0 1,0 50,0 a25,25 0 1,0 -50,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M825.1484444444445,268.8244971197946a19,19 0 1,0 38,0 a19,19 0 1,0 -38,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M744.6711111111113,473.1079195536304a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M684.2622222222221,512.5867952584827a32,32 0 1,0 64,0 a32,32 0 1,0 -64,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M756.6897777777776,527.3375142526729a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M804.4284444444443,703.6118679677193a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M816.5306666666665,712.0032484909111a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M836.1004444444443,660.3753359303578a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M721.184888888889,686.7406771933975a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 "></path><path class="leaflet-interactive" stroke="#c0392b" stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.25" fill-rule="evenodd" d="M657.9555555555557,559.0699600098433a31,31 0 1,0 62,0 a31,31 0 1,0 -62,0 "></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(798px, 459px, 0px); z-index: 459;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(867px, 631px, 0px); z-index: 631;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(823px, 554px, 0px); z-index: 554;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(823px, 554px, 0px); z-index: 554;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(837px, 597px, 0px); z-index: 597;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(810px, 545px, 0px); z-index: 545;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(837px, 597px, 0px); z-index: 597;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(836px, 516px, 0px); z-index: 516;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(832px, 544px, 0px); z-index: 544;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(861px, 627px, 0px); z-index: 627;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(797px, 645px, 0px); z-index: 645;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(822px, 554px, 0px); z-index: 554;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(746px, 439px, 0px); z-index: 439;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(812px, 401px, 0px); z-index: 401;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(746px, 439px, 0px); z-index: 439;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(842px, 658px, 0px); z-index: 658;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(842px, 658px, 0px); z-index: 658;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -5px; margin-top: -5px; width: 10px; height: 10px; transform: translate3d(867px, 631px, 0px); z-index: 631;"><div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div></div></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(3966px, 2637.5px, 0px) scale(16);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="file:///Users/joecoulson/Library/Application%20Support/Claude/local-agent-mode-sessions/c9c7fc00-e3b8-49b7-a4fb-eb74505a0d7a/5cc40eac-33bc-48a1-8b61-272c7bca71e2/local_d0d189dd-4ef0-4183-bb0a-14c17ca56cca/outputs/freddies-flowers-delivery-map.html#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="file:///Users/joecoulson/Library/Application%20Support/Claude/local-agent-mode-sessions/c9c7fc00-e3b8-49b7-a4fb-eb74505a0d7a/5cc40eac-33bc-48a1-8b61-272c7bca71e2/local_d0d189dd-4ef0-4183-bb0a-14c17ca56cca/outputs/freddies-flowers-delivery-map.html#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div><div class="leaflet-control">
+      <div style="background:white;border-radius:8px;padding:12px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.15);font-size:12px;color:#555;max-width:200px;line-height:1.5;">
+        <strong style="color:#333;font-size:13px;">How to use</strong><br>
+        Click any red zone for details.<br>
+        Zoom in to explore specific areas.
+      </div>
+    </div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control">
+      <div class="legend">
+        <h4>Map Key</h4>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(231,76,60,0.5);border:2px solid #c0392b;"></div>
+          No delivery zone
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c0392b;border:2px solid white;width:10px;height:10px;"></div>
+          Specific postcode exclusion
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(44,130,39,0.3);border:2px solid #2d5a27;"></div>
+          Delivers here (mainland UK)
+        </div>
+      </div>
+      <div class="info-panel">
+        <h4>Exclusion Summary</h4>
+        <div class="stat"><span>Scottish Highlands</span><span>Yes</span></div>
+        <div class="stat"><span>Scottish Islands</span><span>Yes</span></div>
+        <div class="stat"><span>Northern Ireland</span><span>Yes</span></div>
+        <div class="stat"><span>Isle of Man</span><span>Yes</span></div>
+        <div class="stat"><span>Channel Islands</span><span>Yes</span></div>
+        <div class="stat"><span>Isle of Wight</span><span>Yes</span></div>
+        <div class="stat"><span>Isles of Scilly</span><span>Yes</span></div>
+        <div class="stat"><span>Individual postcodes</span><span>18</span></div>
+      </div>
+    </div><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com/" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a></div></div></div></div>
+
+<script>
+  const map = L.map('map', {
+    center: [55.5, -3.5],
+    zoom: 6,
+    zoomControl: true
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  // ── Undeliverable zones ──────────────────────────────────────────────────
+  // Each entry: [lat, lng, radiusKm, label, description, postcodes]
+  const noDeliveryZones = [
+
+    // SCOTLAND – HIGHLANDS & NORTH
+    [57.47, -4.30, 95, "Inverness & Highland (IV)",
+      "Inverness and the wider Highlands region",
+      "IV0–IV9 and surrounding districts"],
+
+    [58.55, -3.50, 75, "Caithness, Sutherland & Orkney (KW)",
+      "Far north Scotland including Orkney Islands",
+      "KW0–KW17"],
+
+    [57.10, -2.50, 70, "Aberdeenshire (AB)",
+      "Aberdeen and Aberdeenshire rural districts",
+      "AB28–AB56, AB83"],
+
+    [56.80, -4.00, 90, "Perth, Kinross & Highland (PH)",
+      "Perth, Kinross and remote Highland areas",
+      "PH15–PH99"],
+
+    [56.20, -5.40, 80, "Argyll, Bute & Islands (PA)",
+      "Argyll, Bute and the Western Scottish Islands",
+      "PA20–PA99"],
+
+    [56.58, -4.40, 35, "Stirlingshire Highlands (FK)",
+      "Highland areas of Stirlingshire",
+      "FK17–FK21, FK85"],
+
+    // SCOTTISH ISLANDS
+    [57.85, -6.80, 65, "Outer Hebrides / Western Isles (HS)",
+      "Lewis, Harris, North & South Uist, Barra",
+      "HS1–HS9, HS83"],
+
+    [60.35, -1.18, 45, "Shetland Islands (ZE)",
+      "Shetland archipelago",
+      "ZE, ZE0–ZE9"],
+
+    [55.60, -5.20, 22, "Isle of Arran & Cumbrae (KA)",
+      "Arran and Great Cumbrae islands",
+      "KA27–KA28, KA85–KA86"],
+
+    // NORTHERN IRELAND
+    [54.60, -6.80, 90, "Northern Ireland (BT)",
+      "All of Northern Ireland — we deliver to mainland UK only",
+      "BT, BT0–BT9"],
+
+    // ISLE OF MAN
+    [54.23, -4.54, 30, "Isle of Man (IM)",
+      "Crown dependency — not deliverable",
+      "IM, IM0–IM9"],
+
+    // CHANNEL ISLANDS
+    [49.45, -2.53, 28, "Guernsey (GY)",
+      "Guernsey and surrounding islands",
+      "GY1–GY10, GY72"],
+
+    [49.21, -2.13, 20, "Jersey (JE)",
+      "Jersey — Crown dependency",
+      "JE0–JE9"],
+
+    // ISLE OF WIGHT
+    [50.67, -1.27, 20, "Isle of Wight (PO)",
+      "Isle of Wight — ferry access only",
+      "PO30–PO41"],
+
+    // ISLES OF SCILLY
+    [49.93, -6.32, 18, "Isles of Scilly (TR)",
+      "Remote island group — not deliverable",
+      "TR21–TR25, TR37"],
+
+    // IRELAND (EI)
+    [53.40, -8.00, 90, "Ireland (EI)",
+      "Republic of Ireland — outside UK delivery network",
+      "EI prefix"],
+  ];
+
+  // Individual specific postcodes (full postcode exclusions)
+  const specificPostcodes = [
+    [55.948, -3.200, "EH74BQ", "Specific Edinburgh postcode"],
+    [51.475, -0.190, "SW84BE", "Specific London (SW8) postcode"],
+    [53.545, -2.114, "OL164TG", "Specific Oldham postcode"],
+    [53.545, -2.100, "OL112HS", "Specific Oldham postcode"],
+    [52.400, -1.510, "CV346JT / CV346JR", "Specific Coventry postcodes"],
+    [53.765, -2.700, "PR21EL", "Specific Preston postcode"],
+    [52.400, -1.515, "CV92AA", "Specific Coventry postcode"],
+    [54.526, -1.547, "DL36TD", "Specific Darlington postcode"],
+    [53.795, -1.730, "BD47JT", "Specific Bradford postcode"],
+    [51.600, -0.424, "HA62QA / HA62QN", "Specific Harrow postcodes"],
+    [51.095, -3.245, "TA66PY", "Specific Taunton postcode"],
+    [53.545, -2.150, "PR40PL", "Specific postcode"],
+    [56.430, -5.500, "PA237TP", "Specific Argyll postcode"],
+    [57.350, -2.600, "AB338AJ", "Specific Aberdeenshire postcode"],
+    [56.430, -5.480, "PA209EG", "Specific Argyll postcode"],
+    [50.735, -1.285, "PO31–PO345AX", "Isle of Wight postcodes"],
+    [50.725, -1.295, "PO390DZ / PO410SH", "Isle of Wight postcodes"],
+    [51.475, -0.186, "EH74BQ related", "Edinburgh specific"],
+  ];
+
+  const noDeliveryStyle = {
+    color: '#c0392b',
+    weight: 1.5,
+    opacity: 0.7,
+    fillColor: '#e74c3c',
+    fillOpacity: 0.25
+  };
+
+  // Draw zone circles
+  noDeliveryZones.forEach(([lat, lng, radiusKm, label, desc, codes]) => {
+    const circle = L.circle([lat, lng], {
+      ...noDeliveryStyle,
+      radius: radiusKm * 1000
+    }).addTo(map);
+
+    circle.bindPopup(`
+      <div class="popup-title">${label}</div>
+      <div class="popup-desc">${desc}</div>
+      <div class="popup-codes">${codes}</div>
+    `);
+
+    circle.on('mouseover', function() { this.setStyle({ fillOpacity: 0.45 }); });
+    circle.on('mouseout', function() { this.setStyle({ fillOpacity: 0.25 }); });
+  });
+
+  // Draw specific postcode markers
+  const specificIcon = L.divIcon({
+    html: '<div style="width:10px;height:10px;background:#c0392b;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>',
+    className: '',
+    iconSize: [10, 10],
+    iconAnchor: [5, 5]
+  });
+
+  const seenSpecific = new Set();
+  specificPostcodes.forEach(([lat, lng, code, desc]) => {
+    const key = `${lat},${lng}`;
+    if (seenSpecific.has(key)) return;
+    seenSpecific.add(key);
+
+    L.marker([lat, lng], { icon: specificIcon })
+      .addTo(map)
+      .bindPopup(`
+        <div class="popup-title">Specific Exclusion</div>
+        <div class="popup-desc">${desc}</div>
+        <div class="popup-codes">${code}</div>
+      `);
+  });
+
+  // ── Legend ───────────────────────────────────────────────────────────────
+  const legend = L.control({ position: 'bottomright' });
+  legend.onAdd = function() {
+    const div = L.DomUtil.create('div');
+    div.innerHTML = `
+      <div class="legend">
+        <h4>Map Key</h4>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(231,76,60,0.5);border:2px solid #c0392b;"></div>
+          No delivery zone
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c0392b;border:2px solid white;width:10px;height:10px;"></div>
+          Specific postcode exclusion
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(44,130,39,0.3);border:2px solid #2d5a27;"></div>
+          Delivers here (mainland UK)
+        </div>
+      </div>
+      <div class="info-panel">
+        <h4>Exclusion Summary</h4>
+        <div class="stat"><span>Scottish Highlands</span><span>Yes</span></div>
+        <div class="stat"><span>Scottish Islands</span><span>Yes</span></div>
+        <div class="stat"><span>Northern Ireland</span><span>Yes</span></div>
+        <div class="stat"><span>Isle of Man</span><span>Yes</span></div>
+        <div class="stat"><span>Channel Islands</span><span>Yes</span></div>
+        <div class="stat"><span>Isle of Wight</span><span>Yes</span></div>
+        <div class="stat"><span>Isles of Scilly</span><span>Yes</span></div>
+        <div class="stat"><span>Individual postcodes</span><span>18</span></div>
+      </div>
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
+  // ── Title control ─────────────────────────────────────────────────────────
+  const info = L.control({ position: 'topleft' });
+  info.onAdd = function() {
+    const div = L.DomUtil.create('div');
+    div.innerHTML = `
+      <div style="background:white;border-radius:8px;padding:12px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.15);font-size:12px;color:#555;max-width:200px;line-height:1.5;">
+        <strong style="color:#333;font-size:13px;">How to use</strong><br>
+        Click any red zone for details.<br>
+        Zoom in to explore specific areas.
+      </div>
+    `;
+    return div;
+  };
+  info.addTo(map);
+</script>
+
+
+</body></html>
