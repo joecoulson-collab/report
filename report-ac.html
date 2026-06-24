@@ -1,65 +1,30 @@
 <!DOCTYPE html>
-<html lang="en"><head><script>(function(){
-  var H='5a6dacf65cee2a404a3765b81b8ff4064e5a3cb3945033742e4ac231109fcb05',K='ff_auth_5a6dacf65cee';
-  if(sessionStorage.getItem(K)==='1')return;
-  function injectGate(){
-    if(!document.body)return;
-    var g=document.createElement('div');
-    g.id='ff-gate';
-    g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif;';
-    g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
-      +'<div style="font-size:32px;margin-bottom:8px">🌸</div>'
-      +'<h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin-bottom:4px">Freddie's Flowers</h2>'
-      +'<p style="color:#777;font-size:13px;margin-bottom:28px">Logistics KPI Report — enter password to access</p>'
-      +'<input id="ff-pw" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border .15s" onfocus="this.style.borderColor='#2d4a2d'" onblur="this.style.borderColor='#ddd'">'
-      +'<button id="ff-btn" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#3a6a3a'" onmouseout="this.style.background='#2d4a2d'">Access Report</button>'
-      +'<p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password — please try again</p>'
-      +'</div>';
-    document.body.prepend(g);
-    setTimeout(function(){var i=document.getElementById('ff-pw');if(i)i.focus();},100);
-    document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
-    document.getElementById('ff-btn').addEventListener('click',ffCheck);
-  }
-  async function ffCheck(){
-    var val=document.getElementById('ff-pw').value;
-    if(!val)return;
-    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
-    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
-    if(hex===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
-    else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',injectGate);}else{injectGate();}
-})();</script><script>(function(){
-  var H='b881755217444c0d3c363fb1b55d8405682d9334ab3af662b8cec15cad4db58f',K='ff_auth_b88175521744';
-  if(sessionStorage.getItem(K)==='1')return;
-  function injectGate(){
-    if(!document.body)return;
-    var g=document.createElement('div');
-    g.id='ff-gate';
-    g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif;';
-    g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
-      +'<div style="font-size:32px;margin-bottom:8px">🌸</div>'
-      +'<h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin-bottom:4px">Freddie's Flowers</h2>'
-      +'<p style="color:#777;font-size:13px;margin-bottom:28px">Logistics KPI Report — enter password to access</p>'
-      +'<input id="ff-pw" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border .15s" onfocus="this.style.borderColor='#2d4a2d'" onblur="this.style.borderColor='#ddd'">'
-      +'<button id="ff-btn" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#3a6a3a'" onmouseout="this.style.background='#2d4a2d'">Access Report</button>'
-      +'<p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password — please try again</p>'
-      +'</div>';
-    document.body.prepend(g);
-    setTimeout(function(){var i=document.getElementById('ff-pw');if(i)i.focus();},100);
-    document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
-    document.getElementById('ff-btn').addEventListener('click',ffCheck);
-  }
-  async function ffCheck(){
-    var val=document.getElementById('ff-pw').value;
-    if(!val)return;
-    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
-    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
-    if(hex===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
-    else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',injectGate);}else{injectGate();}
-})();</script>
+<html lang="en"><head><script>
+(function(){
+var H='5a6dacf65cee2a404a3765b81b8ff4064e5a3cb3945033742e4ac231109fcb05',K='ff_auth_5a6dacf65cee';
+if(sessionStorage.getItem(K)==='1')return;
+document.documentElement.style.visibility='hidden';
+function showGate(){
+document.documentElement.style.visibility='';
+var g=document.createElement('div');
+g.id='ff-gate';
+g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif';
+g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)"><div style="font-size:32px;margin-bottom:8px">🌸<\/div><h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin:0 0 4px">Freddie\'s Flowers<\/h2><p style="color:#777;font-size:13px;margin:0 0 28px">Logistics KPI Report<\/p><input id="ff-pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box"><button onclick="ffCheck()" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Access Report<\/button><p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password<\/p><\/div>';
+document.body.prepend(g);
+document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
+setTimeout(function(){document.getElementById('ff-pw').focus();},50);
+}
+window.ffCheck=async function(){
+var v=document.getElementById('ff-pw').value;
+if(!v)return;
+var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));
+var h=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+if(h===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
+else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
+};
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showGate);}else{showGate();}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Freddie's Flowers — Abel &amp; Cole Logistics Report</title>
@@ -7526,43 +7491,43 @@ const WEEK_DATA = {
     "depots": [
       {
         "name": "Andover",
-        "orders": 1209,
+        "orders": 981,
         "errors": 4,
         "dot": 92
       },
       {
         "name": "Ashby",
-        "orders": 1209,
+        "orders": 1597,
         "errors": 6,
         "dot": 92
       },
       {
         "name": "Cambridge",
-        "orders": 1209,
+        "orders": 1149,
         "errors": 4,
         "dot": 92
       },
       {
         "name": "Doncaster",
-        "orders": 1209,
+        "orders": 1259,
         "errors": 6,
         "dot": 92
       },
       {
         "name": "Kent",
-        "orders": 1209,
+        "orders": 720,
         "errors": 4,
         "dot": 92
       },
       {
         "name": "Sharpness",
-        "orders": 1209,
+        "orders": 1382,
         "errors": 15,
         "dot": 92
       },
       {
         "name": "Warrington",
-        "orders": 1209,
+        "orders": 1373,
         "errors": 3,
         "dot": 92
       }
@@ -8400,6 +8365,7 @@ function renderDashboard(){
   el('kpi-orders').innerHTML=`<div class="v">${D.all.totalOrders.toLocaleString()}</div><div class="l">Total Orders</div>`;
   el('kpi-total-err').innerHTML=`<div class="v">${totalErrors}</div><div class="l">Total Errors</div>`;
   el('kpi-charge').innerHTML=`<div class="v">${allCharge}%</div>${kpiDelta(chargeRate-D.all.prevWeekChargeable)}<div class="l">Chargeable Rate</div>`;
+  el('kpi-chargeable-count').innerHTML=`<div class="v">${D.all.chargeableErrors}</div><div class="l">Chargeable Errors</div>`;
   el('kpi-notdel').innerHTML=`<div class="v">${D.all.notDeliveredErrors}</div><div class="l">Not Delivered</div>`;
   el('kpi-delivered').innerHTML=`<div class="v">${D.all.deliveredErrors}</div><div class="l">Delivered Errors</div>`;
   const worstDay=[...D.all.days].sort((a,b)=>(b.errors/b.orders)-(a.errors/a.orders))[0];
@@ -8414,7 +8380,7 @@ function renderDashboard(){
   mkChart('chart-compare',{type:'bar',data:{labels:['A&C','Bikes','GSG','DPD','All'],datasets:[
     {label:'Total %',data:[(D.ac.chargeableErrors+D.ac.nonChargeableErrors)/D.ac.totalOrders*100,(D.bikes.chargeableErrors+D.bikes.nonChargeableErrors)/D.bikes.totalOrders*100,(D.gsg.chargeableErrors+D.gsg.nonChargeableErrors)/D.gsg.totalOrders*100,(D.dpd.chargeableErrors+D.dpd.nonChargeableErrors)/D.dpd.totalOrders*100,(D.all.chargeableErrors+D.all.nonChargeableErrors)/D.all.totalOrders*100].map(v=>+v.toFixed(2)),backgroundColor:['#d4c07a','#8aba8a','#9bbdd4','#e07070','#aaa']},
     {label:'Chargeable %',data:[D.ac.chargeableErrors/D.ac.totalOrders*100,D.bikes.chargeableErrors/D.bikes.totalOrders*100,D.gsg.chargeableErrors/D.gsg.totalOrders*100,D.dpd.chargeableErrors/D.dpd.totalOrders*100,D.all.chargeableErrors/D.all.totalOrders*100].map(v=>+v.toFixed(2)),backgroundColor:['#b5982a','#4a7c4a','#3a6f9a','#c0392b','#666']},
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   /* ── Rolling trend ── */
   mkChart('chart-rolling',{type:'line',data:{labels:R.weeks,datasets:[
@@ -8424,7 +8390,7 @@ function renderDashboard(){
     {label:'DPD (Charge)',data:R.dpdCharge,borderColor:C.dpd,pointRadius:4,tension:.3,fill:false,borderWidth:2.5,spanGaps:true},
     {label:'All Charge',data:R.allCharge,borderColor:C.total,pointRadius:4,tension:.3,fill:false,borderWidth:2,borderDash:[4,3],spanGaps:true},
     {label:'All Total',data:R.allTotal,borderColor:'#888',pointRadius:3,tension:.3,fill:false,borderWidth:1.5,borderDash:[2,2],spanGaps:true},
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   /* ── DOT rolling chart ── */
   const RD=D.rollingDot;
@@ -8433,7 +8399,7 @@ function renderDashboard(){
     {label:'FF Bikes',data:RD.bikes,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'GSG',data:RD.gsg,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'Target (95%)',data:RD.weeks.map(()=>95),borderColor:'#e74c3c',pointRadius:0,borderDash:[6,3],fill:false,borderWidth:1.5},
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}},min:85,max:100}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}},min:85,max:100}})});
 
   /* ── Box return rolling chart ── */
   const RB=D.rollingBox;
@@ -8441,7 +8407,7 @@ function renderDashboard(){
     {label:'A&C',data:RB.ac,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'FF Bikes',data:RB.bikes,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'GSG',data:RB.gsg,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,spanGaps:true},
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   /* ── Day breakdown ── */
   const dayLabels=D.all.days.map(d=>d.name.slice(0,3));
@@ -8449,7 +8415,7 @@ function renderDashboard(){
   mkChart('chart-days',{type:'bar',data:{labels:dayLabels,datasets:[
     {label:'Orders',data:D.all.days.map(d=>d.orders),backgroundColor:'#dde8dd',yAxisID:'y1'},
     {label:'Error Rate %',data:dayRates,type:'line',yAxisID:'y2',pointRadius:5,borderColor:'#555',backgroundColor:dayRates.map(rateColor),borderWidth:1.5,tension:.2}
-  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{grid:{display:false}},y1:{type:'linear',position:'left',grid:{color:'#f0f0f0'},ticks:{font:{size:11}}},y2:{type:'linear',position:'right',grid:{display:false},ticks:{callback:v=>v+'%',font:{size:11}},min:0,max:Math.max(...dayRates)*1.5}}}});
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{x:{grid:{display:false}},y1:{type:'linear',position:'left',grid:{color:'#f0f0f0'},ticks:{font:{size:11}}},y2:{type:'linear',position:'right',grid:{display:false},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}},min:0,max:Math.max(...dayRates)*1.5}}}});
 
   /* ── Error types donut ── */
   mkChart('chart-etypes',{type:'doughnut',data:{labels:top5(D.all.errorTypes).map(e=>e.label),datasets:[{data:top5(D.all.errorTypes).map(e=>e.count),backgroundColor:top5(D.all.errorTypes).map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
@@ -8506,21 +8472,17 @@ function renderDashboard(){
     <div class="kpi ${acRate<0.3?'':'warn'}"><div class="v">${acRate.toFixed(2)}%</div>${kpiDelta(acRate-D.ac.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
     <div class="kpi"><div class="v">${acTotal.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
     <div class="kpi"><div class="v">${D.ac.chargeableErrors+D.ac.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi ${D.ac.chargeableErrors>0?'warn':''}"><div class="v">${D.ac.chargeableErrors}</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi"><div class="v">${D.ac.dot}%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">${D.ac.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
 
-  mkChart('chart-ac-depots',{type:'bar',data:{labels:D.ac.depots.map(d=>d.name),datasets:[{label:'Error Rate %',data:D.ac.depots.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.ac.depots.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  mkChart('chart-ac-depots',{type:'bar',data:{labels:D.ac.depots.map(d=>d.name),datasets:[{label:'Error Rate %',data:D.ac.depots.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.ac.depots.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
 
   mkChart('chart-ac-trend',{type:'line',data:{labels:R.weeks,datasets:[
     {label:'Chargeable %',data:R.acCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'Total %',data:R.acTotal,borderColor:C.ac,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
     targetDS(R.weeks,D.targets.ac,'Target'),
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
-
-  /* A&C depot trend */
-  const DT=D.depotTrends;
-  const depotColors=['#b5982a','#4a7c4a','#5b8fb9','#c0392b','#8e44ad','#16a085','#e67e22'];
-  mkChart('chart-ac-depot-trend',{type:'line',data:{labels:DT.weeks,datasets:DT.depots.map((dep,i)=>({label:dep.name,data:dep.data,borderColor:depotColors[i%depotColors.length],pointRadius:3,tension:.3,fill:false,spanGaps:true,borderWidth:dep.name==='Kent'?2.5:1.5}))},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   /* A&C error type trend + split */
   errorTrendChart('chart-ac-error-trend', D.errorTrends.ac, D.errorTrends.weeks);
@@ -8545,17 +8507,18 @@ function renderDashboard(){
     <div class="kpi ${gsgRate>0.6?'warn':''}"><div class="v">${gsgRate.toFixed(2)}%</div>${kpiDelta(gsgRate-D.gsg.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
     <div class="kpi"><div class="v">${gsgTotalR.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
     <div class="kpi"><div class="v">${D.gsg.chargeableErrors+D.gsg.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi ${D.gsg.chargeableErrors>0?'warn':''}"><div class="v">${D.gsg.chargeableErrors}</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi"><div class="v">${D.gsg.dot}%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">${D.gsg.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
 
   const gsgDrv=[...D.gsg.drivers].map(d=>({...d,rate:+(d.chargeable/d.deliveries*100).toFixed(2)})).sort((a,b)=>b.rate-a.rate);
-  mkChart('chart-gsg-drivers',{type:'bar',data:{labels:gsgDrv.map(d=>d.name),datasets:[{label:'Error Rate %',data:gsgDrv.map(d=>d.rate),backgroundColor:gsgDrv.map(d=>rateColor(d.rate))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  mkChart('chart-gsg-drivers',{type:'bar',data:{labels:gsgDrv.map(d=>d.name),datasets:[{label:'Error Rate %',data:gsgDrv.map(d=>d.rate),backgroundColor:gsgDrv.map(d=>rateColor(d.rate))}]},options:{...dftOpt(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:10}},grid:{color:'#f0f0f0'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
 
   mkChart('chart-gsg-trend',{type:'line',data:{labels:R.weeks,datasets:[
     {label:'Chargeable %',data:R.gsgCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'Total %',data:R.gsgTotal,borderColor:C.gsg,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
     targetDS(R.weeks,D.targets.gsg,'Target'),
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   /* GSG error type trend + split */
   errorTrendChart('chart-gsg-error-trend', D.errorTrends.gsg, D.errorTrends.weeks);
@@ -8580,16 +8543,17 @@ function renderDashboard(){
     <div class="kpi ${bkRate>0.4?'warn':''}"><div class="v">${bkRate.toFixed(2)}%</div>${kpiDelta(bkRate-D.bikes.prevWeekChargeable)}<div class="l">Chargeable Rate</div></div>
     <div class="kpi"><div class="v">${bkTotalR.toFixed(2)}%</div><div class="l">Total Error Rate</div></div>
     <div class="kpi"><div class="v">${D.bikes.chargeableErrors+D.bikes.nonChargeableErrors}</div><div class="l">Total Errors</div></div>
+    <div class="kpi ${D.bikes.chargeableErrors>0?'warn':''}"><div class="v">${D.bikes.chargeableErrors}</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi"><div class="v">${D.bikes.dot}%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">${D.bikes.boxReturnRate}%</div><div class="l">Box Return Rate</div></div>`;
 
-  mkChart('chart-bikes-days',{type:'bar',data:{labels:D.bikes.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.bikes.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.bikes.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+  mkChart('chart-bikes-days',{type:'bar',data:{labels:D.bikes.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.bikes.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.bikes.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}}}});
 
   mkChart('chart-bikes-trend',{type:'line',data:{labels:R.weeks,datasets:[
     {label:'Chargeable %',data:R.bikesCharge,borderColor:C.charge,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'Total %',data:R.bikesTotal,borderColor:C.bikes,pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
     targetDS(R.weeks,D.targets.bikes,'Target'),
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   mkChart('chart-bikes-etypes',{type:'doughnut',data:{labels:top5(D.bikes.errorTypes).map(e=>e.label),datasets:[{data:top5(D.bikes.errorTypes).map(e=>e.count),backgroundColor:top5(D.bikes.errorTypes).map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
 
@@ -8625,13 +8589,13 @@ function renderDashboard(){
     <div class="kpi bad"><div class="v">${D.dpd.chargeableErrors}</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi bad"><div class="v">${dpdWorstDay.name}</div><div class="l">Worst Day (${(dpdWorstDay.errors/dpdWorstDay.orders*100).toFixed(2)}%)</div></div>`;
 
-  mkChart('chart-dpd-days',{type:'bar',data:{labels:D.dpd.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.dpd.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.dpd.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}}}});
+  mkChart('chart-dpd-days',{type:'bar',data:{labels:D.dpd.days.map(d=>d.name.slice(0,3)),datasets:[{label:'Error Rate %',data:D.dpd.days.map(d=>+(d.errors/d.orders*100).toFixed(2)),backgroundColor:D.dpd.days.map(d=>rateColor(d.errors/d.orders*100))}]},options:{...dftOpt(),plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}}}});
 
   mkChart('chart-dpd-trend',{type:'line',data:{labels:R.weeks,datasets:[
     {label:'Chargeable %',data:R.dpdCharge,borderColor:C.dpd,pointRadius:4,tension:.3,fill:false,spanGaps:true},
     {label:'Total %',data:R.dpdTotal,borderColor:'#e07070',pointRadius:4,tension:.3,fill:false,borderDash:[4,3],spanGaps:true},
     targetDS(R.weeks,D.targets.dpd,'Target'),
-  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%',font:{size:11}}}})});
+  ]},options:dftOpt({y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>(+parseFloat(v).toFixed(2))+'%',font:{size:11}}}})});
 
   mkChart('chart-dpd-etypes',{type:'doughnut',data:{labels:top5(D.dpd.errorTypes).map(e=>e.label),datasets:[{data:top5(D.dpd.errorTypes).map(e=>e.count),backgroundColor:top5(D.dpd.errorTypes).map((e,i)=>DONUT_COLORS[i%DONUT_COLORS.length])}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} errors`}}}}});
 
@@ -8649,13 +8613,14 @@ function renderDashboard(){
   renderActions('bikes', 'actions-bikes');
   renderActions('dpd',   'actions-dpd');
 
-  // Restore pages — CSS classes control visibility again
-  allPages.forEach(p => { p.style.display = ''; p.style.visibility = ''; p.style.position = ''; });
+  /* ── Build extra tabs while pages are still block-visible ── */
+  try { buildErrorsTab(); } catch(e) { console.warn('buildErrorsTab error:', e); }
+  try { buildDriversTab(); } catch(e) { console.warn('buildDriversTab error:', e); }
+  try { buildGiftTab(); } catch(e) { console.warn('buildGiftTab error:', e); }
+  try { buildWeeklyTab(); } catch(e) { console.warn('buildWeeklyTab error:', e); }
 
-  /* ── Errors tab: build pill list ── */
-  buildErrorsTab();
-  buildDriversTab();
-  buildGiftTab();
+  // Restore pages — ALWAYS runs via try/finally so pages never stay hidden
+  allPages.forEach(p => { p.style.display = ''; p.style.visibility = ''; p.style.position = ''; });
 
 } // end renderDashboard
 window.addEventListener('DOMContentLoaded', renderDashboard);
@@ -8699,43 +8664,36 @@ async function exportHTML(courierKey) {
       if (hdrP) hdrP.innerHTML = 'Week <span id="hdr-week">' + (WEEK_DATA.week||'') + '</span> · Overview &amp; ' + COURIER_NAMES[courierKey];
     }
 
-    // Inject password gate script if a password is set
+    // Password gate injected as string — more reliable than DOM injection for serialization
+    let gateScriptStr = '';
     if (pwHash) {
       const sessionKey = 'ff_auth_' + pwHash.slice(0, 12);
-      const gateScript = clone.ownerDocument ? clone.ownerDocument.createElement('script') : document.createElement('script');
-      gateScript.textContent = `(function(){
-  var H='${pwHash}',K='${sessionKey}';
-  if(sessionStorage.getItem(K)==='1')return;
-  function injectGate(){
-    if(!document.body)return;
-    var g=document.createElement('div');
-    g.id='ff-gate';
-    g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif;';
-    g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
-      +'<div style="font-size:32px;margin-bottom:8px">🌸</div>'
-      +'<h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin-bottom:4px">Freddie\'s Flowers</h2>'
-      +'<p style="color:#777;font-size:13px;margin-bottom:28px">Logistics KPI Report — enter password to access</p>'
-      +'<input id="ff-pw" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box;outline:none;transition:border .15s" onfocus="this.style.borderColor=\'#2d4a2d\'" onblur="this.style.borderColor=\'#ddd\'">'
-      +'<button id="ff-btn" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s" onmouseover="this.style.background=\'#3a6a3a\'" onmouseout="this.style.background=\'#2d4a2d\'">Access Report</button>'
-      +'<p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password — please try again</p>'
-      +'</div>';
-    document.body.prepend(g);
-    setTimeout(function(){var i=document.getElementById('ff-pw');if(i)i.focus();},100);
-    document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
-    document.getElementById('ff-btn').addEventListener('click',ffCheck);
-  }
-  async function ffCheck(){
-    var val=document.getElementById('ff-pw').value;
-    if(!val)return;
-    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
-    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
-    if(hex===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
-    else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',injectGate);}else{injectGate();}
-})();`;
-      const head = clone.querySelector('head');
-      if (head) head.insertBefore(gateScript, head.firstChild);
+      gateScriptStr = `<script>
+(function(){
+var H='${pwHash}',K='${sessionKey}';
+if(sessionStorage.getItem(K)==='1')return;
+document.documentElement.style.visibility='hidden';
+function showGate(){
+document.documentElement.style.visibility='';
+var g=document.createElement('div');
+g.id='ff-gate';
+g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif';
+g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)"><div style="font-size:32px;margin-bottom:8px">🌸<\\/div><h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin:0 0 4px">Freddie\\'s Flowers<\\/h2><p style="color:#777;font-size:13px;margin:0 0 28px">Logistics KPI Report<\\/p><input id="ff-pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box"><button onclick="ffCheck()" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Access Report<\\/button><p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password<\\/p><\\/div>';
+document.body.prepend(g);
+document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
+setTimeout(function(){document.getElementById('ff-pw').focus();},50);
+}
+window.ffCheck=async function(){
+var v=document.getElementById('ff-pw').value;
+if(!v)return;
+var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));
+var h=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+if(h===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
+else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
+};
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showGate);}else{showGate();}
+})();
+<\/script>`;
     }
 
     // Build export data — filter history to courier if courier-specific export
@@ -8759,6 +8717,11 @@ async function exportHTML(courierKey) {
     let html = '<!DOCTYPE html>\n' + clone.outerHTML;
     // Use function replacement to avoid $ interpretation issues in the replacement string
     html = html.replace(/\/\* DATA_START \*\/[\s\S]*?\/\* DATA_END \*\//, () => dataStr);
+
+    // Inject gate right after <head> opening tag (string injection — most reliable)
+    if (gateScriptStr) {
+      html = html.replace('<head>', '<head>' + gateScriptStr);
+    }
 
     document.getElementById('export-menu').style.display = 'none';
 
@@ -8811,6 +8774,174 @@ async function syncFromSheets() {
     if (status) { status.textContent = '✕ ' + err.message; status.className = 'err'; }
   }
   if (btn) { btn.textContent = '🔄 Sync from Sheets'; btn.disabled = false; }
+}
+
+/* ═══════════════════ WEEKLY BROWSER TAB ═══════════════════ */
+
+function buildWeeklyTab() {
+  const D = WEEK_DATA;
+  const eh = D.errorHistory || {byType:{},weeks:[],currentWeek:''};
+  const weeks = eh.weeks || [];
+  const currentWeek = eh.currentWeek || '';
+
+  const container = el('week-pills-container');
+  if (!container) return;
+
+  if (!weeks.length) {
+    container.innerHTML = '<p style="color:#999;font-size:13px">Upload a CSV to browse errors by week.</p>';
+    return;
+  }
+
+  // Build week pills — most recent first, current week highlighted
+  container.innerHTML = weeks.slice().reverse().map(wl => {
+    const isCurrent = wl === currentWeek;
+    const allRecs = Object.values(eh.byType).flat().filter(e => 'WK'+e.week === wl);
+    return `<div class="error-pill ${isCurrent?'active':''}" onclick="showWeekDetail('${wl}')" id="wpill-${wl}" style="${isCurrent?'--color:#2d4a2d':''}">
+      <span class="pill-count" style="color:${isCurrent?'#f0c040':'#2d4a2d'}">${allRecs.length}</span>
+      <span>${wl}${isCurrent?' (current)':''}</span>
+    </div>`;
+  }).join('');
+
+  // Auto-select current week
+  if (currentWeek) showWeekDetail(currentWeek);
+}
+
+function showWeekDetail(weekLabel) {
+  const D = WEEK_DATA;
+  const eh = D.errorHistory || {byType:{},weeks:[],currentWeek:''};
+  const weeks = eh.weeks || [];
+
+  // Highlight selected pill
+  document.querySelectorAll('#week-pills-container .error-pill').forEach(p => p.classList.remove('active'));
+  const pill = el('wpill-' + weekLabel);
+  if (pill) pill.classList.add('active');
+  el('weekly-detail').style.display = 'block';
+
+  const allRecs = Object.values(eh.byType).flat().filter(e => 'WK'+e.week === weekLabel);
+  const wkIndex = weeks.indexOf(weekLabel);
+  const prevWeekLabel = wkIndex > 0 ? weeks[wkIndex-1] : null;
+  const prevRecs = prevWeekLabel ? Object.values(eh.byType).flat().filter(e => 'WK'+e.week === prevWeekLabel) : [];
+  const giftRecs = allRecs.filter(e => e.giftCore === 'Gift');
+  const coreRecs = allRecs.filter(e => e.giftCore === 'Core');
+
+  ['chart-weekly-courier','chart-weekly-types','chart-weekly-day','chart-weekly-gift'].forEach(id => {
+    const c = Chart.getChart(el(id)); if(c) c.destroy();
+  });
+
+  const courierNames = {ac:'A&C', gsg:'GSG', bikes:'Bikes', dpd:'DPD'};
+  const courierColors = {ac:'#b5982a', gsg:'#5b8fb9', bikes:'#4a7c4a', dpd:'#c0392b'};
+  const shortLabel = l => l.replace('Flowers not received - ','').replace('Instructions not followed - ','').replace('Driver Notified No Flowers - ','').replace('Driver Notified - ','');
+
+  // Compute rates using rolling data (delivery numbers per courier)
+  const rollingWks = D.rolling?.weeks || [];
+  const rollingIdx = rollingWks.indexOf(weekLabel);
+  function getRollingRate(key) {
+    if (rollingIdx < 0 || !D.rolling?.[key]) return null;
+    return D.rolling[key][rollingIdx];
+  }
+  const chargeRate = getRollingRate('allCharge');
+  const totalRate  = getRollingRate('allTotal');
+  const prevChargeRate = prevWeekLabel ? D.rolling?.allCharge?.[rollingIdx-1] : null;
+
+  // Courier breakdown
+  const courierCounts = {ac:0, gsg:0, bikes:0, dpd:0};
+  allRecs.forEach(e => { if(courierCounts[e.courierKey]!==undefined) courierCounts[e.courierKey]++; });
+  const topCourier = Object.entries(courierCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  // Error types
+  const typeMap = {};
+  allRecs.forEach(e => { const t=e.errorType||'Other'; typeMap[t]=(typeMap[t]||0)+1; });
+  const topType = Object.entries(typeMap).sort((a,b)=>b[1]-a[1])[0];
+
+  // Days
+  const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayCounts=DAYS.map(d=>allRecs.filter(e=>e.dayName===d).length);
+  const worstDay=DAYS[dayCounts.indexOf(Math.max(...dayCounts))];
+  const bestDay=DAYS[dayCounts.indexOf(Math.min(...dayCounts.filter(v=>v>0)))];
+
+  // WoW
+  const wowCount = allRecs.length - prevRecs.length;
+  const wowStr = prevRecs.length ? (wowCount>0?`▲ ${wowCount} vs ${prevWeekLabel}`:`▼ ${Math.abs(wowCount)} vs ${prevWeekLabel}`) : '';
+  const wowClass = wowCount>0?'bad-t':wowCount<0?'good':'';
+
+  // KPIs
+  const rateKpi = chargeRate!=null
+    ? `<div class="kpi ${chargeRate>1?'bad':chargeRate>0.5?'warn':''}"><div class="v">${chargeRate.toFixed(2)}%</div><div class="l">Chargeable Rate</div></div>
+       <div class="kpi"><div class="v">${totalRate!=null?totalRate.toFixed(2)+'%':'—'}</div><div class="l">Total Error Rate</div></div>`
+    : '';
+  el('weekly-kpis').innerHTML = `
+    <div class="kpi"><div class="v">${allRecs.length}</div>${wowStr?`<span class="delta ${wowClass}" style="font-size:11px;font-weight:600">${wowStr}</span>`:''}<div class="l">Total Errors</div></div>
+    ${rateKpi}
+    <div class="kpi warn"><div class="v">${giftRecs.length}</div><div class="l">Gift Errors</div></div>
+    <div class="kpi bad"><div class="v">${topCourier?courierNames[topCourier[0]]:'—'}</div><div class="l">Most Errors (${topCourier?topCourier[1]:0})</div></div>`;
+
+  // ── Auto-generated analysis ──
+  const chargeWow = (chargeRate!=null&&prevChargeRate!=null) ? chargeRate-prevChargeRate : null;
+  let analysis = '';
+  // Opening line — overall direction
+  if (chargeWow!=null) {
+    if (chargeWow <= -0.05) analysis += `<strong>Improvement vs ${prevWeekLabel}</strong> — chargeable rate fell ${Math.abs(chargeWow).toFixed(2)}pp to ${chargeRate.toFixed(2)}%. `;
+    else if (chargeWow >= 0.10) analysis += `<strong>⚠️ Error rate up ${chargeWow.toFixed(2)}pp</strong> vs ${prevWeekLabel} to ${chargeRate.toFixed(2)}% chargeable. `;
+    else analysis += `Error rate relatively stable at <strong>${chargeRate!=null?chargeRate.toFixed(2)+'% chargeable':allRecs.length+' total errors'}</strong>. `;
+  } else {
+    analysis += `<strong>${weekLabel}</strong> recorded ${allRecs.length} total errors. `;
+  }
+  // Courier callout
+  if (topCourier && topCourier[1]>0) {
+    const secondCourier = Object.entries(courierCounts).sort((a,b)=>b[1]-a[1])[1];
+    analysis += `<strong>${courierNames[topCourier[0]]}</strong> had the most errors (${topCourier[1]})`;
+    if (secondCourier && secondCourier[1]>0) analysis += `, followed by ${courierNames[secondCourier[0]]} (${secondCourier[1]})`;
+    analysis += '. ';
+  }
+  // Day callout
+  if (worstDay && Math.max(...dayCounts)>0) analysis += `${worstDay} was the worst day`;
+  if (bestDay && bestDay!==worstDay) analysis += `; ${bestDay} the best`;
+  if (worstDay) analysis += '. ';
+  // Top error type
+  if (topType) analysis += `Top error: <strong>${shortLabel(topType[0])}</strong> (${topType[1]} cases). `;
+  // Gift/Core
+  if (giftRecs.length>0) {
+    const giftPct = Math.round(giftRecs.length/allRecs.length*100);
+    analysis += `Gift errors accounted for ${giftPct}% of all errors this week.`;
+  }
+  const tone = (chargeWow!=null&&chargeWow>=0.10)||(!chargeWow&&allRecs.length>200) ? 'warn' : 'good';
+  el('weekly-analysis').className = `insight ${tone}`;
+  el('weekly-analysis').innerHTML = analysis || 'Select a week to see analysis.';
+
+  // Charts
+  mkChart('chart-weekly-courier',{type:'bar',data:{
+    labels:['A&C','GSG','Bikes','DPD'],
+    datasets:[{label:'Errors',data:[courierCounts.ac,courierCounts.gsg,courierCounts.bikes,courierCounts.dpd],
+      backgroundColor:['#b5982a','#5b8fb9','#4a7c4a','#c0392b']}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:11}},beginAtZero:true}}}});
+
+  const topTypes = Object.entries(typeMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  mkChart('chart-weekly-types',{type:'bar',data:{
+    labels:topTypes.map(([l])=>shortLabel(l)),
+    datasets:[{label:'Count',data:topTypes.map(([,v])=>v),backgroundColor:DONUT_COLORS}]
+  },options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  mkChart('chart-weekly-day',{type:'bar',data:{
+    labels:DAYS.map(d=>d.slice(0,3)),
+    datasets:[{label:'Errors',data:dayCounts,backgroundColor:dayCounts.map((v,i)=>i>=5?'#e67e22':v===Math.max(...dayCounts)&&v>0?'#c0392b':'#4a7c4a')}]
+  },options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f0f0'},ticks:{stepSize:1,font:{size:11}},beginAtZero:true}}}});
+
+  mkChart('chart-weekly-gift',{type:'doughnut',data:{
+    labels:[`Gift (${giftRecs.length})`,`Core (${coreRecs.length})`],
+    datasets:[{data:[giftRecs.length,coreRecs.length],backgroundColor:['#e67e22','#4a7c4a']}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}});
+
+  // Top drivers table
+  const drvMap={};
+  allRecs.forEach(e=>{const d=e.driver||'(unknown)';if(!drvMap[d])drvMap[d]={count:0,courier:e.courierKey};drvMap[d].count++;});
+  const topDrivers=Object.entries(drvMap).sort((a,b)=>b[1].count-a[1].count).slice(0,10);
+  el('weekly-driver-table').innerHTML=topDrivers.length
+    ?`<table class="tbl"><thead><tr><th>Driver</th><th>Courier</th><th style="text-align:right">Errors</th></tr></thead><tbody>${
+      topDrivers.map(([n,{count,courier}])=>`<tr><td>${n}</td><td style="color:#666;font-size:11px">${courierNames[courier]||courier}</td><td style="text-align:right;font-weight:700">${count}</td></tr>`).join('')
+    }</tbody></table>`
+    :'<p style="color:#999;padding:8px;font-size:12px">No data</p>';
+
+  el('weekly-detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 /* ═══════════════════ GIFT FAILURES TAB ═══════════════════ */
@@ -8888,6 +9019,202 @@ function buildGiftTab() {
       topDrivers.map(([n,{count,courier}])=>`<tr><td>${n}</td><td style="color:#666;font-size:11px">${cNames[courier]||courier}</td><td style="text-align:right;font-weight:700">${count}</td></tr>`).join('')
     }</tbody></table>`
     :'<p style="color:#999;font-size:12px;padding:8px">No gift error data — upload CSV</p>';
+}
+
+/* ═══════════════════ EMAIL SUMMARY EXPORT ═══════════════════ */
+
+function exportEmailSummary() {
+  const D = WEEK_DATA;
+  const status = document.getElementById('upload-status');
+  document.getElementById('export-menu').style.display = 'none';
+
+  const WN = D.week;
+  const R = D.rolling;
+  const wkIdx = R?.weeks?.indexOf(`WK${WN}`) ?? -1;
+  const prevIdx = wkIdx > 0 ? wkIdx - 1 : -1;
+
+  // Helper functions
+  const pctFmt = v => v!=null ? v.toFixed(2)+'%' : '—';
+  const delta = (curr, prev) => {
+    if (curr==null || prev==null) return '';
+    const d = curr - prev;
+    return d < 0 ? ` (▼ ${Math.abs(d).toFixed(2)}pp)` : d > 0 ? ` (▲ ${d.toFixed(2)}pp)` : ' (unchanged)';
+  };
+  const shortLabel = l => l.replace('Flowers not received - ','').replace('Instructions not followed - ','').replace('Driver Notified No Flowers - ','').replace('Driver Notified - ','');
+
+  // Rates this week
+  const rates = {
+    ac:    { charge: R?.acCharge?.[wkIdx], prev: R?.acCharge?.[prevIdx] },
+    gsg:   { charge: R?.gsgCharge?.[wkIdx], prev: R?.gsgCharge?.[prevIdx] },
+    bikes: { charge: R?.bikesCharge?.[wkIdx], prev: R?.bikesCharge?.[prevIdx] },
+    dpd:   { charge: R?.dpdCharge?.[wkIdx], prev: R?.dpdCharge?.[prevIdx] },
+    all:   { charge: R?.allCharge?.[wkIdx], prev: R?.allCharge?.[prevIdx], total: R?.allTotal?.[wkIdx] },
+  };
+
+  // Chargeable rate direction
+  const allWow = rates.all.charge!=null && rates.all.prev!=null ? rates.all.charge - rates.all.prev : null;
+  const networkDir = allWow!=null ? (allWow < -0.05 ? 'improved' : allWow > 0.10 ? 'worsened' : 'remained stable') : 'was recorded';
+
+  // Best/worst courier
+  const courierRates = [{k:'ac',n:'Abel & Cole',r:rates.ac.charge},{k:'gsg',n:'Global Heston',r:rates.gsg.charge},{k:'bikes',n:'FF Bikes SW',r:rates.bikes.charge},{k:'dpd',n:'DPD',r:rates.dpd.charge}].filter(c=>c.r!=null);
+  const bestCourier  = courierRates.length ? courierRates.reduce((a,b)=>a.r<b.r?a:b) : null;
+  const worstCourier = courierRates.length ? courierRates.reduce((a,b)=>a.r>b.r?a:b) : null;
+
+  // Error types breakdown
+  const topTypes = (D.all?.errorTypes||[]).filter(e=>e.label!=='Other').slice(0,5);
+
+  // Actions
+  const openActions = (D.actions||[]).filter(a=>a.status!=='Closed');
+  const allActions  = (D.actions||[]);
+
+  // Comments
+  const comments = {
+    all:   D.all?.notes || D.all?.prevWeekChargeable != null ? '' : '',
+    ac:    D.ac?.notes || '',
+    gsg:   D.gsg?.notes || '',
+    bikes: D.bikes?.notes || '',
+    dpd:   D.dpd?.notes || '',
+  };
+
+  // DOT
+  const dotStr = [
+    D.ac?.dot    ? `Abel &amp; Cole ${D.ac.dot}%`    : null,
+    D.gsg?.dot   ? `Global Heston ${D.gsg.dot}%`   : null,
+    D.bikes?.dot ? `FF Bikes SW ${D.bikes.dot}%`    : null,
+  ].filter(Boolean).join(' · ');
+
+  const emailHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WK${WN} Logistics Email Summary</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f0e8;margin:0;padding:32px;}
+  .email{max-width:680px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+  .header{background:#2d4a2d;color:white;padding:32px 40px;border-bottom:4px solid #d4a017;}
+  .header h1{font-size:20px;font-weight:700;margin:0 0 4px;}
+  .header p{font-size:13px;opacity:.7;margin:0;}
+  .body{padding:32px 40px;}
+  .section{margin-bottom:28px;}
+  .section h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#2d4a2d;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #e8e8e8;}
+  p{font-size:14px;line-height:1.7;color:#333;margin:0 0 10px;}
+  .metric-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+  .metric{background:#f5f0e8;border-radius:8px;padding:12px 16px;flex:1;min-width:120px;}
+  .metric .val{font-size:22px;font-weight:800;color:#2d4a2d;}
+  .metric .lbl{font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
+  .metric.warn .val{color:#d4a017;}
+  .metric.bad .val{color:#c0392b;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+  th{background:#2d4a2d;color:white;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;}
+  td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}
+  tr:last-child td{border-bottom:none;}
+  .good{color:#2d7a2d;font-weight:600;}
+  .warn{color:#d4a017;font-weight:600;}
+  .bad{color:#c0392b;font-weight:600;}
+  .action-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;}
+  .badge-open{background:#fdf8ec;color:#b87800;border:1px solid #f0c040;}
+  .badge-inprogress{background:#eef3fb;color:#1a5fa8;border:1px solid #90b8e8;}
+  .footer{background:#f0f0f0;padding:20px 40px;font-size:12px;color:#888;border-top:1px solid #e0e0e0;}
+  .link-box{background:#2d4a2d;color:white;padding:14px 20px;border-radius:8px;margin:16px 0;font-size:13px;}
+  .link-box a{color:#f0c040;font-weight:700;}
+  .copy-hint{font-size:11px;color:#999;text-align:center;margin-top:16px;font-style:italic;}
+</style>
+</head>
+<body>
+<div class="email">
+  <div class="header">
+    <h1>Freddie's Flowers — Week ${WN} Logistics Report</h1>
+    <p>Shareholder Summary · Prepared ${new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>
+  </div>
+  <div class="body">
+
+    <div class="section">
+      <h2>Opening</h2>
+      <p>Please find below a summary of our logistics performance for Week ${WN}. The full interactive report — including courier-level breakdowns, error trends, driver analysis, and weekly comparisons — is available at the link below.</p>
+      <div class="link-box">📊 Full report: <a href="[INSERT REPORT URL HERE]">[INSERT REPORT URL HERE]</a></div>
+    </div>
+
+    <div class="section">
+      <h2>Network Overview</h2>
+      <div class="metric-row">
+        <div class="metric"><div class="val">${D.all?.totalOrders?.toLocaleString()||'—'}</div><div class="lbl">Total Orders</div></div>
+        <div class="metric ${rates.all.charge!=null&&rates.all.charge>1?'bad':rates.all.charge>0.5?'warn':''}">
+          <div class="val">${pctFmt(rates.all.charge)}</div><div class="lbl">Chargeable Rate${delta(rates.all.charge,rates.all.prev)}</div></div>
+        <div class="metric"><div class="val">${pctFmt(rates.all.total)}</div><div class="lbl">Total Error Rate</div></div>
+        ${dotStr?`<div class="metric"><div class="val" style="font-size:14px">${dotStr}</div><div class="lbl">DOT</div></div>`:''}
+      </div>
+      <p>Network chargeable error rate ${networkDir} this week${allWow!=null?' ('+delta(rates.all.charge,rates.all.prev).replace(/[()]/g,'').trim()+')':''}.
+      ${bestCourier?`<strong>${bestCourier.n}</strong> was the best-performing courier at ${pctFmt(bestCourier.r)}.`:''}
+      ${worstCourier&&worstCourier.k!==bestCourier?.k?`<strong>${worstCourier.n}</strong> had the highest error rate at ${pctFmt(worstCourier.r)}, requiring continued focus.`:''}</p>
+    </div>
+
+    <div class="section">
+      <h2>Courier Performance</h2>
+      <table>
+        <thead><tr><th>Courier</th><th>Chargeable Rate</th><th>vs Previous Week</th><th>Notes</th></tr></thead>
+        <tbody>
+          ${[
+            {n:'Abel &amp; Cole', k:'ac', note:comments.ac||D.ac?.notes||'—'},
+            {n:'Global Heston',   k:'gsg', note:comments.gsg||D.gsg?.notes||'—'},
+            {n:'FF Bikes SW',     k:'bikes', note:comments.bikes||D.bikes?.notes||'—'},
+            {n:'DPD',             k:'dpd', note:comments.dpd||D.dpd?.notes||'—'},
+          ].map(c => {
+            const r=rates[c.k].charge, p=rates[c.k].prev;
+            const cls=r==null?'':r>1?'bad':r>0.5?'warn':'good';
+            const d=r!=null&&p!=null?delta(r,p):'';
+            return `<tr><td><strong>${c.n}</strong></td><td class="${cls}">${pctFmt(r)}</td><td>${d||'—'}</td><td style="font-size:12px;color:#555">${c.note}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${topTypes.length?`
+    <div class="section">
+      <h2>Top Error Types This Week</h2>
+      <table>
+        <thead><tr><th>Error Type</th><th style="text-align:right">Count</th></tr></thead>
+        <tbody>${topTypes.map(e=>`<tr><td>${shortLabel(e.label)}</td><td style="text-align:right;font-weight:700">${e.count}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`:''}
+
+    ${openActions.length?`
+    <div class="section">
+      <h2>Actions &amp; Improvements (${openActions.length} open)</h2>
+      <table>
+        <thead><tr><th>Action</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead>
+        <tbody>${openActions.map(a=>`<tr>
+          <td style="font-size:12px">${a.action}</td>
+          <td style="font-size:12px;color:#555">${a.owner}</td>
+          <td style="font-size:12px;color:#555">${a.due}</td>
+          <td><span class="action-badge ${a.status==='In Progress'?'badge-inprogress':'badge-open'}">${a.status}</span></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`:''}
+
+    <div class="section">
+      <h2>Next Steps</h2>
+      <p>The full interactive report provides drill-down analysis by courier, depot, driver, error type, and day of week. Please follow the link above to explore in detail. Any questions, please don't hesitate to get in touch.</p>
+    </div>
+
+  </div>
+  <div class="footer">
+    Freddie's Flowers Logistics · Week ${WN} · Generated ${new Date().toISOString().slice(0,10)} · This summary is auto-generated from the weekly logistics data.
+  </div>
+</div>
+<p class="copy-hint">Open this file in a browser, select all (Ctrl/Cmd+A), copy, and paste into your email client — formatting will be preserved.</p>
+</body>
+</html>`;
+
+  const blob = new Blob([emailHTML], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FF_WK${WN}_Email_Summary.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  if (status) { status.textContent = `✓ Email summary downloaded — WK${WN}`; status.className = 'ok'; }
 }
 
 /* ═══════════════════ DRIVERS TAB ═══════════════════ */
@@ -9465,9 +9792,15 @@ function parseCSV(text){
     const dep=getACDepot(e.driver);
     if(dep){if(!acDepotCounts[dep])acDepotCounts[dep]=0;acDepotCounts[dep]++;}
   });
-  const ordPerDepot=D.ac.totalOrders?Math.round(D.ac.totalOrders/depotList.length):0;
+  // Use per-depot order volumes if provided, fall back to equal split
+  const acDepotOrdersMap={};
+  (sections['AC_DEPOT_ORDERS']||[]).forEach(r=>{if(r[0])acDepotOrdersMap[r[0].trim()]=toNum(r[1],0);});
+  const hasDepotOrders=Object.keys(acDepotOrdersMap).length>0;
+  const ordPerDepotFallback=D.ac.totalOrders?Math.round(D.ac.totalOrders/depotList.length):0;
   D.ac.depots=depotList.map(name=>({
-    name,orders:ordPerDepot,errors:acDepotCounts[name]||0,
+    name,
+    orders:hasDepotOrders?(acDepotOrdersMap[name]||ordPerDepotFallback):ordPerDepotFallback,
+    errors:acDepotCounts[name]||0,
     dot:dotRolling.ac?.[currentWeekLabel]||null,
   }));
 
@@ -9631,7 +9964,7 @@ function handleCSVUpload(event){
 <div class="upload-bar">
   <button id="sheets-btn" class="export-btn" onclick="syncFromSheets()" style="background:#1a6b3a;" title="Pull latest data directly from the Google Sheet">🔄 Sync from Sheets</button>
   <label for="csv-upload">📂 Load CSV<input type="file" id="csv-upload" accept=".csv" onchange="handleCSVUpload(event)"></label>
-  <span id="upload-status" class="ok">✓ Downloaded WK24 — Full report</span>
+  <span id="upload-status" class="ok">✓ WK24 loaded successfully</span>
   <div id="export-wrapper">
     <button class="export-btn" onclick="toggleExportMenu()">⬇ Export &amp; Share ▾</button>
     <div id="export-menu" style="display: block;">
@@ -9641,6 +9974,8 @@ function handleCSVUpload(event){
       <button onclick="exportHTML('gsg')">GSG Global only</button>
       <button onclick="exportHTML('bikes')">FF Bikes only</button>
       <button onclick="exportHTML('dpd')">DPD only</button>
+      <hr>
+      <button onclick="exportEmailSummary()">📧 Shareholder email summary</button>
     </div>
   </div>
 </div>
@@ -9654,6 +9989,7 @@ function handleCSVUpload(event){
   <div class="tab" onclick="showPage('errors',this)">🔍 Errors</div>
   <div class="tab" onclick="showPage('drivers',this)">👤 Drivers</div>
   <div class="tab" onclick="showPage('gift',this)">🎁 Gift Failures</div>
+  <div class="tab" onclick="showPage('weekly',this)">📅 Browse by Week</div>
 </div>
 
 <!-- ══ OVERVIEW ══ -->
@@ -9663,6 +9999,7 @@ function handleCSVUpload(event){
     <div class="kpi" id="kpi-orders"><div class="v">27,139</div><div class="l">Total Orders</div></div>
     <div class="kpi" id="kpi-total-err"><div class="v">254</div><div class="l">Total Errors</div></div>
     <div class="kpi warn" id="kpi-charge"><div class="v">0.78%</div><span class="delta down">▼ 0.14pp vs WK23</span><div class="l">Chargeable Rate</div></div>
+    <div class="kpi warn" id="kpi-chargeable-count"><div class="v">213</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi" id="kpi-notdel"><div class="v">193</div><div class="l">Not Delivered</div></div>
     <div class="kpi warn" id="kpi-delivered"><div class="v">61</div><div class="l">Delivered Errors</div></div>
     <div class="kpi bad" id="kpi-worst-day"><div class="v">Sunday</div><div class="l">Worst Day (1.67%)</div></div>
@@ -9745,19 +10082,19 @@ function handleCSVUpload(event){
     <div class="kpi warn"><div class="v">0.51%</div><span class="delta flat">≈ flat vs last week</span><div class="l">Chargeable Rate</div></div>
     <div class="kpi"><div class="v">0.61%</div><div class="l">Total Error Rate</div></div>
     <div class="kpi"><div class="v">52</div><div class="l">Total Errors</div></div>
+    <div class="kpi warn"><div class="v">43</div><div class="l">Chargeable Errors</div></div>
     <div class="kpi"><div class="v">92%</div><div class="l">DOT</div></div>
     <div class="kpi"><div class="v">21%</div><div class="l">Box Return Rate</div></div></div>
   <div class="row2">
     <div class="card"><h3>Error Rate by Depot</h3><canvas id="chart-ac-depots" height="986" style="box-sizing: border-box; display: block; height: 493px; width: 643px;" width="1286"></canvas></div>
     <div class="card"><h3>Total vs Chargeable Error Rate Trend</h3><canvas id="chart-ac-trend" height="986" style="box-sizing: border-box; display: block; height: 493px; width: 643px;" width="1286"></canvas></div>
   </div>
-  <div class="row3">
-    <div class="card"><h3>Depot Error Rate Trend (WK15–)</h3><canvas id="chart-ac-depot-trend" height="602" style="box-sizing: border-box; display: block; height: 301px; width: 410px;" width="821"></canvas></div>
-    <div class="card"><h3>Top Error Types — Dynamic Weekly Trend</h3><canvas id="chart-ac-error-trend" height="602" style="box-sizing: border-box; display: block; height: 301px; width: 410px;" width="821"></canvas></div>
-    <div class="card"><h3>Error Type Split</h3><canvas id="chart-ac-etypes" height="821" style="box-sizing: border-box; display: block; height: 410px; width: 410px;" width="821"></canvas></div>
+  <div class="row2">
+    <div class="card"><h3>Top Error Types — Dynamic Weekly Trend</h3><canvas id="chart-ac-error-trend" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Error Type Split</h3><canvas id="chart-ac-etypes" height="1286" style="box-sizing: border-box; display: block; height: 643px; width: 643px;" width="1286"></canvas></div>
   </div>
   <div class="row2">
-    <div class="card scroll-wrap"><h3>Depot Breakdown</h3><div id="ac-depot-table"><table class="tbl"><thead><tr><th>Depot</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Andover</td><td>1,209</td><td>4</td><td class="g">0.33%</td></tr><tr><td>Ashby</td><td>1,209</td><td>6</td><td class="g">0.50%</td></tr><tr><td>Cambridge</td><td>1,209</td><td>4</td><td class="g">0.33%</td></tr><tr><td>Doncaster</td><td>1,209</td><td>6</td><td class="g">0.50%</td></tr><tr><td>Kent</td><td>1,209</td><td>4</td><td class="g">0.33%</td></tr><tr><td>Sharpness</td><td>1,209</td><td>15</td><td class="b">1.24%</td></tr><tr><td>Warrington</td><td>1,209</td><td>3</td><td class="g">0.25%</td></tr><tr><td>Total</td><td>8,463</td><td>42</td><td class="g">0.50%</td></tr></tbody></table></div></div>
+    <div class="card scroll-wrap"><h3>Depot Breakdown</h3><div id="ac-depot-table"><table class="tbl"><thead><tr><th>Depot</th><th>Orders</th><th>Errors</th><th>Rate</th></tr></thead><tbody><tr><td>Andover</td><td>981</td><td>4</td><td class="g">0.41%</td></tr><tr><td>Ashby</td><td>1,597</td><td>6</td><td class="g">0.38%</td></tr><tr><td>Cambridge</td><td>1,149</td><td>4</td><td class="g">0.35%</td></tr><tr><td>Doncaster</td><td>1,259</td><td>6</td><td class="g">0.48%</td></tr><tr><td>Kent</td><td>720</td><td>4</td><td class="w">0.56%</td></tr><tr><td>Sharpness</td><td>1,382</td><td>15</td><td class="b">1.09%</td></tr><tr><td>Warrington</td><td>1,373</td><td>3</td><td class="g">0.22%</td></tr><tr><td>Total</td><td>8,461</td><td>42</td><td class="g">0.50%</td></tr></tbody></table></div></div>
   </div>
   <div class="row1">
     <div class="card"><h3>Actions for Improvement</h3><div id="actions-ac">
@@ -9783,6 +10120,55 @@ function handleCSVUpload(event){
 <!-- ══ DPD ══ -->
 
 
+<!-- ══ WEEKLY ══ -->
+<div class="page" id="page-weekly" style="">
+  <div class="insight good" style="margin-bottom:20px">
+    <strong>Browse by Week</strong> — select any week to see a full breakdown of errors, courier performance, error types, and top drivers for that period.
+  </div>
+  <div class="card row1" style="margin-bottom:20px">
+    <h3>Select Week</h3>
+    <div id="week-pills-container" style="display:flex;flex-wrap:wrap;gap:10px;padding:4px 0"><div class="error-pill active" onclick="showWeekDetail('WK24')" id="wpill-WK24" style="--color:#2d4a2d">
+      <span class="pill-count" style="color:#f0c040">254</span>
+      <span>WK24 (current)</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK23')" id="wpill-WK23" style="">
+      <span class="pill-count" style="color:#2d4a2d">320</span>
+      <span>WK23</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK22')" id="wpill-WK22" style="">
+      <span class="pill-count" style="color:#2d4a2d">324</span>
+      <span>WK22</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK21')" id="wpill-WK21" style="">
+      <span class="pill-count" style="color:#2d4a2d">278</span>
+      <span>WK21</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK20')" id="wpill-WK20" style="">
+      <span class="pill-count" style="color:#2d4a2d">257</span>
+      <span>WK20</span>
+    </div><div class="error-pill" onclick="showWeekDetail('WK19')" id="wpill-WK19" style="">
+      <span class="pill-count" style="color:#2d4a2d">229</span>
+      <span>WK19</span>
+    </div></div>
+  </div>
+  <div id="weekly-detail" style="display: block;">
+    <div id="weekly-analysis" class="insight good" style="margin-bottom:16px"><strong>Improvement vs WK23</strong> — chargeable rate fell 0.14pp to 0.78%. <strong>DPD</strong> had the most errors (112), followed by GSG (63). Monday was the worst day; Saturday the best. Top error: <strong>Parcel held (DPD)</strong> (47 cases). Gift errors accounted for 20% of all errors this week.</div>
+    <div class="kpi-row" id="weekly-kpis">
+    <div class="kpi"><div class="v">254</div><span class="delta good" style="font-size:11px;font-weight:600">▼ 66 vs WK23</span><div class="l">Total Errors</div></div>
+    <div class="kpi warn"><div class="v">0.78%</div><div class="l">Chargeable Rate</div></div>
+       <div class="kpi"><div class="v">0.94%</div><div class="l">Total Error Rate</div></div>
+    <div class="kpi warn"><div class="v">52</div><div class="l">Gift Errors</div></div>
+    <div class="kpi bad"><div class="v">DPD</div><div class="l">Most Errors (112)</div></div></div>
+    <div class="row2">
+      <div class="card"><h3>Errors by Courier</h3><canvas id="chart-weekly-courier" height="943" style="display: block; box-sizing: border-box; height: 471px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Top Error Types</h3><canvas id="chart-weekly-types" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+    </div>
+    <div class="row2">
+      <div class="card"><h3>Errors by Day</h3><canvas id="chart-weekly-day" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+      <div class="card"><h3>Gift vs Core Split</h3><canvas id="chart-weekly-gift" height="1286" width="1286" style="display: block; box-sizing: border-box; height: 643px; width: 643px;"></canvas></div>
+    </div>
+    <div class="row1">
+      <div class="card scroll-wrap"><h3>Top Drivers / Riders</h3><div id="weekly-driver-table"><table class="tbl"><thead><tr><th>Driver</th><th>Courier</th><th style="text-align:right">Errors</th></tr></thead><tbody><tr><td>DPD</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">112</td></tr><tr><td>(unknown)</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">21</td></tr><tr><td>NicholasGSG</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">21</td></tr><tr><td>Abel and Cole Sharpness</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">15</td></tr><tr><td>Stanislavs Senko Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">11</td></tr><tr><td>Abel and Cole Doncaster</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>Abel and Cole Ashby</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>AriGSG</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>Abel and Cole Cambridge</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">4</td></tr><tr><td>Abel and Cole Andover</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">4</td></tr></tbody></table></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ GIFT ══ -->
 <div class="page" id="page-gift" style="">
   <div class="insight warn" style="margin-bottom:20px">
@@ -9795,12 +10181,12 @@ function handleCSVUpload(event){
     <div class="kpi warn"><div class="v">20%</div><div class="l">Gift Share of All Errors</div></div>
     <div class="kpi bad"><div class="v">DPD—46</div><div class="l">Highest Gift Errors</div></div></div>
   <div class="row2">
-    <div class="card"><h3>Gift vs Core Errors — Weekly Trend</h3><canvas id="chart-gift-trend" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Gift Errors by Courier — This Week</h3><canvas id="chart-gift-courier" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Gift vs Core Errors — Weekly Trend</h3><canvas id="chart-gift-trend" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Gift Errors by Courier — This Week</h3><canvas id="chart-gift-courier" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
   </div>
   <div class="row2">
-    <div class="card"><h3>Gift Errors by Day — This Week</h3><canvas id="chart-gift-day" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
-    <div class="card"><h3>Top Gift Error Types — This Week</h3><canvas id="chart-gift-types" height="0" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0"></canvas></div>
+    <div class="card"><h3>Gift Errors by Day — This Week</h3><canvas id="chart-gift-day" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+    <div class="card"><h3>Top Gift Error Types — This Week</h3><canvas id="chart-gift-types" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
   </div>
   <div class="row1">
     <div class="card scroll-wrap"><h3>Top Drivers / Riders — Gift Errors This Week</h3><div id="gift-driver-table"><table class="tbl"><thead><tr><th>Driver/Rider</th><th>Courier</th><th style="text-align:right">Gift Errors</th></tr></thead><tbody><tr><td>DPD</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">46</td></tr><tr><td>Clem FFBikes</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">2</td></tr><tr><td>Abel and Cole Sharpness</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">2</td></tr><tr><td>Abel and Cole Ashby</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">1</td></tr><tr><td>Marco C FFBikes</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">1</td></tr></tbody></table></div></div>
