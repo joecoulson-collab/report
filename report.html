@@ -1,30 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style=""><head><script>
-(function(){
-var H='b881755217444c0d3c363fb1b55d8405682d9334ab3af662b8cec15cad4db58f',K='ff_auth_b88175521744';
-if(sessionStorage.getItem(K)==='1')return;
-document.documentElement.style.visibility='hidden';
-function showGate(){
-document.documentElement.style.visibility='';
-var g=document.createElement('div');
-g.id='ff-gate';
-g.style.cssText='position:fixed;inset:0;background:#2d4a2d;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,sans-serif';
-g.innerHTML='<div style="background:#f5f0e8;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)"><div style="font-size:32px;margin-bottom:8px">🌸<\/div><h2 style="color:#2d4a2d;font-size:20px;font-weight:800;margin:0 0 4px">Freddie\'s Flowers<\/h2><p style="color:#777;font-size:13px;margin:0 0 28px">Logistics KPI Report<\/p><input id="ff-pw" type="password" placeholder="Password" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #ddd;border-radius:8px;margin-bottom:12px;box-sizing:border-box"><button onclick="ffCheck()" style="width:100%;background:#2d4a2d;color:white;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Access Report<\/button><p id="ff-err" style="color:#c0392b;font-size:12px;margin-top:12px;display:none">Incorrect password<\/p><\/div>';
-document.body.prepend(g);
-document.getElementById('ff-pw').addEventListener('keypress',function(e){if(e.key==='Enter')ffCheck();});
-setTimeout(function(){document.getElementById('ff-pw').focus();},50);
-}
-window.ffCheck=async function(){
-var v=document.getElementById('ff-pw').value;
-if(!v)return;
-var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));
-var h=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
-if(h===H){sessionStorage.setItem(K,'1');document.getElementById('ff-gate').remove();}
-else{document.getElementById('ff-err').style.display='block';document.getElementById('ff-pw').value='';document.getElementById('ff-pw').focus();}
-};
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showGate);}else{showGate();}
-})();
-</script><script>
+<html lang="en"><head><script>
 (function(){
 var H='b881755217444c0d3c363fb1b55d8405682d9334ab3af662b8cec15cad4db58f',K='ff_auth_b88175521744';
 if(sessionStorage.getItem(K)==='1')return;
@@ -37027,7 +37002,7 @@ function handleCSVUpload(event){
 <div class="upload-bar">
   <button id="sheets-btn" class="export-btn" onclick="syncFromSheets()" style="background:#1a6b3a;" title="Pull latest data directly from the Google Sheet">🔄 Sync from Sheets</button>
   <label for="csv-upload">📂 Load CSV<input type="file" id="csv-upload" accept=".csv" onchange="handleCSVUpload(event)"></label>
-  <span id="upload-status" class="ok">✓ Email summary downloaded — WK26</span>
+  <span id="upload-status" class="ok">✓ WK26 loaded successfully</span>
   <div id="export-wrapper">
     <button class="export-btn" onclick="toggleExportMenu()">⬇ Export &amp; Share ▾</button>
     <div id="export-menu" style="display: block;">
@@ -37338,12 +37313,12 @@ function handleCSVUpload(event){
     <div class="kpi warn"><div class="v">65</div><div class="l">Gift Errors</div></div>
     <div class="kpi bad"><div class="v">DPD</div><div class="l">Most Errors (111)</div></div></div>
     <div class="row2">
-      <div class="card"><h3>Errors by Courier</h3><canvas id="chart-weekly-courier" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
-      <div class="card"><h3>Top Error Types</h3><canvas id="chart-weekly-types" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Errors by Courier</h3><canvas id="chart-weekly-courier" height="943" style="display: block; box-sizing: border-box; height: 471px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Top Error Types</h3><canvas id="chart-weekly-types" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
     </div>
     <div class="row2">
-      <div class="card"><h3>Errors by Day</h3><canvas id="chart-weekly-day" height="943" style="box-sizing: border-box; display: block; height: 471px; width: 643px;" width="1286"></canvas></div>
-      <div class="card"><h3>Gift vs Core Split</h3><canvas id="chart-weekly-gift" height="1286" style="box-sizing: border-box; display: block; height: 643px; width: 643px;" width="1286"></canvas></div>
+      <div class="card"><h3>Errors by Day</h3><canvas id="chart-weekly-day" height="943" width="1286" style="display: block; box-sizing: border-box; height: 471px; width: 643px;"></canvas></div>
+      <div class="card"><h3>Gift vs Core Split</h3><canvas id="chart-weekly-gift" height="1286" width="1286" style="display: block; box-sizing: border-box; height: 643px; width: 643px;"></canvas></div>
     </div>
     <div class="row1">
       <div class="card scroll-wrap"><h3>Top Drivers / Riders</h3><div id="weekly-driver-table"><table class="tbl"><thead><tr><th>Driver</th><th>Courier</th><th style="text-align:right">Errors</th></tr></thead><tbody><tr><td>DPD</td><td style="color:#666;font-size:11px">DPD</td><td style="text-align:right;font-weight:700">111</td></tr><tr><td>(unknown)</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">16</td></tr><tr><td>Abel and Cole Sharpness</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">11</td></tr><tr><td>Abel and Cole Doncaster</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">10</td></tr><tr><td>Abel and Cole Kent</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">9</td></tr><tr><td>Marco C FFBikes</td><td style="color:#666;font-size:11px">Bikes</td><td style="text-align:right;font-weight:700">7</td></tr><tr><td>Abel and Cole Warrington</td><td style="color:#666;font-size:11px">A&amp;C</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>DannyGSG Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">6</td></tr><tr><td>Stanislavs Senko Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">5</td></tr><tr><td>Daniel Mlot Global</td><td style="color:#666;font-size:11px">GSG</td><td style="text-align:right;font-weight:700">4</td></tr></tbody></table></div></div>
